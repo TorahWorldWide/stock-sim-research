@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מחקר: נתוני שוק וסימולטורי מסחר</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--fg:#1d1d1f;--muted:#6e6e73;--line:#e5e5ea;--bg:#fff;--soft:#f5f5f7;--acc:#0a66c2;--ok:#1a7f37;--warn:#9a6700;--bad:#b42318}
+@media (prefers-color-scheme:dark){:root{--fg:#f5f5f7;--muted:#a1a1a6;--line:#2c2c2e;--bg:#000;--soft:#1c1c1e;--acc:#4da3ff;--ok:#3fb950;--warn:#d4a72c;--bad:#f85149}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans Hebrew",sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 80px}
+h1{font-size:1.7rem;line-height:1.25;margin:.4em 0 .2em;letter-spacing:-.01em}
+h2{font-size:1.35rem;margin:2.2em 0 .6em;padding-top:.6em;border-top:1px solid var(--line)}
+h3{font-size:1.12rem;margin:1.6em 0 .4em}
+h4{font-size:1rem;margin:1.2em 0 .3em;color:var(--muted)}
+p,li{max-width:70ch}
+a{color:var(--acc);text-decoration:none;word-break:break-word}a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--soft);padding:.1em .35em;border-radius:5px;direction:ltr;unicode-bidi:embed}
+pre{direction:ltr;text-align:left;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow:auto;font-size:.82rem;line-height:1.5}
+pre code{background:none;padding:0;font-size:inherit}
+blockquote{margin:1em 0;padding:.4em 1em;border-right:3px solid var(--line);color:var(--muted)}
+.tbl{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1em -16px;padding:0 16px}
+table{border-collapse:collapse;font-size:.86rem;min-width:600px}
+th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:right}
+th{background:var(--soft);position:sticky;top:0;font-weight:600}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--soft) 55%,transparent)}
+.meta{color:var(--muted);font-size:.9rem}
+nav.toc{background:var(--soft);border-radius:12px;padding:12px 16px;margin:18px 0 26px;font-size:.93rem}
+nav.toc ul{list-style:none;margin:0;padding:0;columns:1}
+nav.toc li.d3{padding-right:16px;font-size:.88rem;color:var(--muted)}
+nav.toc summary{cursor:pointer;font-weight:600}
+.tag-ok,.tag-warn,.tag-bad{font-weight:600}
+.tag-ok{color:var(--ok)}.tag-warn{color:var(--warn)}.tag-bad{color:var(--bad)}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+.top{position:fixed;bottom:18px;left:18px;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:.85rem}
+@media (min-width:700px){nav.toc ul{columns:2}}
+</style>
+</head>
+<body>
+<main>
+<p class="meta">נבנה 2026-10-07 17:21 UTC</p>
+<h1 id="מחקר-נתוני-שוק-וסימולטורי-מסחר-לסימולטור-האישי">מחקר: נתוני שוק וסימולטורי מסחר — לסימולטור האישי</h1>
+<p>נבדקו 35 מקורות נתונים (ספקים עם מפתח, ברוקרים, מקורות ללא מפתח, ת&quot;א/אירופה/אסיה ואופציות), 13 פלטפורמות דמו קיימות, 8 סימולטורים בקוד פתוח ו־6 משפחות של נוסחאות לספרד והחלקה. הבדיקות החיות של העובדים נעשו ב־2026-10-07 בין 16:40 ל־17:30 UTC (השוק בארה&quot;ב פתוח, ת&quot;א/אירופה/אסיה סגורות), ושלוש בדיקות החזרה של העורך נעשו ב־17:02–17:04 UTC.
+מקרא: ✅ נבדק ועובד היום עם curl · 📄 נקרא בלבד (אין מפתח/חשבון, או שהדף נקרא בלי הרצה) · ❌ נכשל היום · <strong>(אומת היום)</strong> = נבדק באתר הרשמי או ב־curl · <strong>(לא אומת)</strong> = מקור משני, זיכרון או דף שלא נפתח.
+הערת יושר: כל ששת החלקים התקבלו ומלאים. פערים שנשארו מסומנים במפורש בכל סעיף ובנספח, ולא הושלמו בניחוש. היכן שעובדים סתרו זה את זה, שתי הגרסאות מופיעות עם הכרעה או עם סימון &quot;לא הוכרע&quot;.</p>
+<h2 id="תקציר-והמלצות">תקציר והמלצות</h2>
+<p><strong>מקור מומלץ לגרסה ראשונה בחינם: Yahoo Finance chart v8 (לא רשמי), דרך שרת/proxy קטן.</strong></p>
+<ul>
+<li><strong>שלוש סיבות:</strong> (1) זה המקור היחיד שעבר היום ארבע בדיקות חיות בלתי תלויות (A3, A4 ובדיקת החזרה של העורך ב־17:02:28Z), והוא החזיר ל־AAPL נר דקה שחותמת הזמן שלו זהה לשנייה של הבקשה (אומת היום). (2) כיסוי רחב במקור אחד: ארה&quot;ב, ת&quot;א (<code>TEVA.TA</code>), לונדון, Xetra, פריז, טוקיו, הונג־קונג; היסטוריה יומית של 20+ שנה (<code>range=5y</code> החזיר 1,255 נרות), נרות דקה ל־30 יום, נרות 5 דקות ל־60 יום, רשימת עולות/יורדות (screener) ושרשרת אופציות (v7) (אומת היום). (3) בלי מפתח, בלי הרשמה, בלי כרטיס אשראי, ובלי הגבלה על תושבי ישראל.</li>
+<li><strong>הסיכון הגדול:</strong> תנאי השימוש של Yahoo אוסרים במפורש איסוף אוטומטי (&quot;robots, spiders, scrapers … without our express, prior permission&quot;, <a href="https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html" target="_blank" rel="noopener">Yahoo ToS</a>, אומת היום). זה API לא מתועד שיכול להישבר או להיחסם בלי הודעה (היום Stooq נחסם לגמרי, ו־A4 קיבל 429 מ־<code>query1</code>). לכן חובה שכבת גיבוי.</li>
+</ul>
+<p><strong>מקור גיבוי: Alpaca Market Data (תוכנית Basic, חשבון Paper Only).</strong> רשמי, עם תנאי שימוש שמתירים &quot;personal and non-commercial&quot; (<a href="https://files.alpaca.markets/disclosures/library/TermsAndConditions.pdf" target="_blank" rel="noopener">ToS PDF</a>), הרשמה באימייל בלבד &quot;Anyone globally&quot; (<a href="https://docs.alpaca.markets/docs/paper-trading" target="_blank" rel="noopener">Paper Trading</a>), 200 קריאות לדקה, היסטוריה מ־2016 כולל נרות דקה, bid/ask (של IEX בלבד) ורשימת movers (<a href="https://alpaca.markets/data" target="_blank" rel="noopener">alpaca.markets/data</a>) (אומת היום בתיעוד). מצב בדיקה: 📄 נקרא בלבד, כי אין מפתח demo. החיסרון: זמן אמת רק מבורסת IEX (כ־2.5% מהנפח), ונתוני SIP מלאים באיחור 15 דק&#39;.</p>
+<p><strong>מקור בתשלום נמוך: Massive (לשעבר Polygon.io) Stocks Starter, ‎$29 לחודש</strong> (<a href="https://massive.com/pricing" target="_blank" rel="noopener">pricing</a>, אומת היום). מוסיף: קריאות ללא הגבלה, 5 שנות היסטוריה כולל נרות דקה, WebSocket, איחור 15 דק&#39; במקום סוף יום. לא מוסיף זמן אמת ולא bid/ask. אם נחוץ bid/ask מאוחד בזמן אמת (מה שבאמת מדמה ביצוע גרוע במניות קטנות), אף תוכנית מתחת ל־‎$99 לחודש (Alpaca Algo Trader Plus, SIP מלא + OPRA) לא נותנת את זה (אומת היום).</p>
+<p><strong>5 עובדות שבונה חייב לדעת:</strong></p>
+<ol>
+<li><strong>&quot;זמן אמת&quot; בחינם הוא כמעט תמיד בורסה אחת, לא SIP מאוחד.</strong> Yahoo, Nasdaq.com ו־CNBC מחזירים &quot;Nasdaq Last Sale&quot;; Alpaca מחזירה IEX; Twelve Data החזירה נפח של 582K מול 13.9M במקור מאוחד באותו רגע (אומת היום). לנפח ולנזילות צריך מקור מאוחד (EODHD, Nasdaq.com, Cboe, dxFeed), גם אם הוא מאחר 15 דק&#39;.</li>
+<li><strong>כמעט כל המקורות דורשים שרת קטן (proxy).</strong> אין כותרת CORS ב־Yahoo, Nasdaq.com, Cboe, Google, Finviz, Tiingo, EODHD, <code>api.tase.co.il</code>, Börse Frankfurt. יש CORS פתוח רק ב־Alpha Vantage, Twelve Data, Finnhub, FMP, Marketstack, Massive, Alpaca, Tradier, dxFeed demo, CNBC ו־TradingView (אומת היום). וגם כשיש CORS, מפתח סודי בקוד הדפדפן נחשף.</li>
+<li><strong>מלכודת תנאי שימוש:</strong> כל הספקים עם מפתח מגבילים ל&quot;שימוש אישי/פנימי&quot; ואוסרים להציג או להפיץ את הנתונים. ברגע שהסימולטור נפתח לחברים, זה מפר את התנאים (Alpha Vantage, Twelve Data, Finnhub, EODHD, Tiingo, Alpaca, Massive, אומת היום). TradingView מתירה &quot;display-only&quot; בלבד, כלומר שימוש מתוכנת ב־scanner כנראה אסור.</li>
+<li><strong>מגבלות שמכשילות סימולטור:</strong> Alpha Vantage 25 קריאות ביום (סוף יום בלבד בחינם); Marketstack 100 בחודש; EODHD 20 ביום; Massive 5 לדקה; Twelve Data 800 ביום (מספיק לכ־10 מניות בעדכון של דקה); Yahoo מחזיר 429 מיד כשאין User-Agent. היסטוריה של 5 שנים אין בחינם ב־EODHD, Marketstack (שנה אחת) ו־Massive (שנתיים).</li>
+<li><strong>אופציות בחינם:</strong> Cboe delayed JSON הוא המקור היחיד ללא מפתח עם שרשרת מלאה, bid/ask עם גודל, OI, IV ו־Greeks (3,568 חוזים ל־AAPL), באיחור 15 דק&#39; ובלי היסטוריה (אומת היום). להיסטוריה: Alpha Vantage <code>HISTORICAL_OPTIONS</code> (סוף יום, 25 ביום) או קבצי optionsDX. אופציות בזמן אמת בחינם לא נמצאו.</li>
+</ol>
+<p><strong>הערות הכרעה של העורך (איפה העובדים לא הסכימו):</strong></p>
+<ul>
+<li>A1 המליץ על Twelve Data, A2 על Alpaca, A3 על Yahoo + Nasdaq.com, A4 על Yahoo. ההמלצה כאן היא Yahoo לגרסה ראשונה בגלל כיסוי ובדיקות חיות, ו־Alpaca כגיבוי משפטי ועצמאי. api.nasdaq.com נשאר המקור החינמי הטוב ביותר ל־bid/ask אמיתי במניות ארה&quot;ב (ספרד של 5 סנט ב־AAPL, אומת היום).</li>
+<li>A3 כתב ש־<code>range=max</code> מחזיר נתונים יומיים מ־1984; A4 כתב שהרזולוציה יורדת אוטומטית. בדיקת העורך (17:03:42Z): <code>interval=1d&amp;range=max</code> החזיר <code>dataGranularity: 3mo</code>, 169 נרות. <strong>A4 צודק.</strong> לנתונים יומיים ארוכים צריך <code>period1/period2</code> או <code>range=5y</code>/<code>10y</code>.</li>
+<li>A4 דיווח ש־<code>query1</code> החזיר 429 בקריאה הראשונה; A3 ובדיקת העורך קיבלו 200 מ־<code>query1</code>. כנראה חסימה זמנית לפי IP. <strong>לא הוכרע</strong>, ולכן כדאי לתמוך בשני ה־hosts.</li>
+<li>A3 מדד <code>exchangeDataDelayedBy: 15</code> ל־TEVA.TA, בעוד טבלת העזרה של Yahoo אומרת 20 דק&#39; לת&quot;א (<a href="https://help.yahoo.com/kb/SLN2310.html" target="_blank" rel="noopener">SLN2310</a>). שני הנתונים מופיעים, <strong>לא הוכרע</strong>.</li>
+</ul>
+<h2 id="חלק-א-מקורות-נתוני-שוק">חלק א — מקורות נתוני שוק</h2>
+<h3 id="טבלת-השוואה-ראשית">טבלת השוואה ראשית</h3>
+<div class="tbl"><table><thead><tr><th>מקור</th><th>איחור</th><th>מגבלות חינם</th><th>בורסות</th><th>מפתח?</th><th>פוסלים</th><th>ישראל</th><th>מהדפדפן?</th><th>תנאי שימוש אישי</th><th>תוכנית זולה</th><th>בדיקה חיה</th></tr></thead><tbody><tr><td><strong>Alpha Vantage</strong> (A1, A4)</td><td>סוף יום (יום המסחר הקודם); זמן אמת/15 דק&#39; רק בתשלום</td><td>25 בקשות ביום</td><td>ארה&quot;ב + גלובלי (לא אומת)</td><td>כן, אימייל</td><td>לא נמצאו</td><td>לא נמצאה הגבלה</td><td>✅ <code>*</code></td><td>אישי, לא מסחרי</td><td>‎$49.99/חודש, 75 לדקה</td><td>✅ IBM עם <code>demo</code> (גם בדיקת העורך 17:02:31Z)</td></tr>
+<tr><td><strong>Finnhub</strong> (A1)</td><td>&quot;realtime&quot; לארה&quot;ב לפי האתר (לא אומת)</td><td>60 לדקה (לא אומת, ללא קישור)</td><td>ארה&quot;ב בחינם</td><td>כן</td><td>לא אומת</td><td>לא נמצאה הגבלה</td><td>✅ <code>*</code></td><td>&quot;strictly for personal use&quot;</td><td>לא אומת (JS)</td><td>📄 אין demo (401)</td></tr>
+<tr><td><strong>Twelve Data</strong> (A1)</td><td>זמן אמת לארה&quot;ב, נמדד כדקה</td><td>8 קרדיטים לדקה, 800 ביום</td><td>ארה&quot;ב, פורקס, קריפטו</td><td>כן, בלי כרטיס</td><td>אין</td><td>לא נמצאה הגבלה</td><td>✅ <code>*</code></td><td>Internal Use, אסור מסחרי</td><td>‎$79/חודש (Grow)</td><td>✅ AAPL 336.11</td></tr>
+<tr><td><strong>Massive (Polygon.io)</strong> (A1, A4)</td><td>סוף יום; Starter 15 דק&#39;</td><td>5 לדקה; שנתיים היסטוריה</td><td>ארה&quot;ב</td><td>כן</td><td>לא אומת</td><td>לא באמברגו → מותר</td><td>✅ משקף Origin</td><td>אישי, לא מסחרי</td><td>‎$29/חודש Starter (מניות או אופציות)</td><td>📄 אין demo (401)</td></tr>
+<tr><td><strong>FMP</strong> (A1)</td><td>סוף יום (לא אומת, 403)</td><td>250 ביום (לא אומת)</td><td>בעיקר ארה&quot;ב</td><td>כן</td><td>בלי כרטיס (לא אומת)</td><td>לא אומת</td><td>✅ <code>*</code></td><td>לא אומת (403)</td><td>לא אומת</td><td>❌ <code>demo</code> נדחה 401</td></tr>
+<tr><td><strong>Tiingo</strong> (A1)</td><td>סוף יום; IEX רק ב־Power</td><td>50 לשעה, 1,000 ביום, 500 סימבולים בחודש</td><td>ארה&quot;ב</td><td>כן</td><td>לא אומת</td><td>לא נמצאה הגבלה</td><td>❌ אין CORS</td><td>&quot;Internal Use Only&quot;</td><td>‎$30/חודש Power</td><td>📄 אין demo (403)</td></tr>
+<tr><td><strong>EODHD</strong> (A1)</td><td>15–20 דק&#39; (נמדד 15)</td><td>20 ביום (+500 בונוס), 20 לדקה; שנה היסטוריה</td><td>70+ בורסות (TASE לא אומת)</td><td>כן</td><td>לא אומת</td><td>לא נמצאה הגבלה</td><td>⚠️ אין <code>allow-origin</code></td><td>פרטי, לא מסחרי, אסור להציג</td><td>‎£19.99/חודש (EOD בלבד)</td><td>✅ AAPL 335.42</td></tr>
+<tr><td><strong>Marketstack</strong> (A1)</td><td>סוף יום</td><td>100 בחודש; שנה היסטוריה</td><td>2,700+ בורסות</td><td>כן</td><td>לא אומת</td><td>לא אומת</td><td>✅ <code>*</code></td><td>לא אומת</td><td>‎$9.99/חודש</td><td>📄 אין demo (401)</td></tr>
+<tr><td><strong>Alpaca Basic</strong> (A2)</td><td>IEX בזמן אמת; SIP באיחור 15 דק&#39;</td><td>200 לדקה; WS עד 30 סימבולים</td><td>ארה&quot;ב</td><td>כן, אימייל (Paper Only)</td><td>אין</td><td>&quot;Anyone globally&quot;</td><td>✅ <code>*</code> (מפתח נחשף)</td><td>אישי, לא מסחרי</td><td>‎$99/חודש Algo Trader Plus</td><td>📄 401 בלי מפתח</td></tr>
+<tr><td><strong>Tradier Sandbox</strong> (A2, A4)</td><td>15 דק&#39;</td><td>60 לדקה</td><td>ארה&quot;ב (מניות+אופציות)</td><td>כן, token</td><td>⚠️ כנראה חשבון ברוקראז&#39; (KYC)</td><td>לא אומת</td><td>✅ <code>*</code></td><td>לא אומת</td><td>Pro ‎$10/חודש (מסלול עמלות)</td><td>📄 401</td></tr>
+<tr><td><strong>Interactive Brokers API</strong> (A2)</td><td>Cboe One+IEX בזמן אמת ללקוח ממומן</td><td>אין חינמי</td><td>גלובלי כולל ת&quot;א</td><td>חשבון ממומן</td><td>❌ חשבון ממומן + KYC</td><td>לא אומת</td><td>❌ Gateway מקומי</td><td>Non-Pro אישי (לא אומת)</td><td>‎$10/חודש + מינימום ‎$500 בחשבון</td><td>📄</td></tr>
+<tr><td><strong>Charles Schwab API</strong> (A2)</td><td>זמן אמת ללקוחות (לא אומת)</td><td>לא אומת</td><td>ארה&quot;ב</td><td>חשבון + אישור אפליקציה</td><td>❌ חשבון ברוקראז&#39;</td><td>לא אומת</td><td>OAuth → שרת</td><td>—</td><td>חינם ללקוחות</td><td>📄 401</td></tr>
+<tr><td><strong>Webull OpenAPI</strong> (A2)</td><td>לפי מנוי בתשלום</td><td>לא אומת</td><td>ארה&quot;ב ועוד</td><td>חשבון + בקשת API</td><td>❌ חשבון, אישור 1–2 ימים, נתונים בתשלום</td><td>לא אומת</td><td>❌ HMAC → שרת</td><td>לא אומת</td><td>לא אומת</td><td>📄</td></tr>
+<tr><td><strong>moomoo / Futu OpenD</strong> (A2)</td><td>US LV3 &quot;בתקופת מבצע&quot;</td><td>60 ל־30 שנ&#39;; 100 מנויים + 100 סימבולי היסטוריה לשבוע</td><td>ארה&quot;ב, HK, A-shares</td><td>חשבון moomoo + OpenD מקומי</td><td>⚠️ שאלון, הסכמים, תוכנה מקומית</td><td>❓ ישראל לא ברשימה (לא אומת)</td><td>❌ TCP מקומי</td><td>לא נבדק</td><td>—</td><td>📄</td></tr>
+<tr><td><strong>Databento</strong> (A2)</td><td>זמן אמת רק במנוי</td><td>‎$125 קרדיט חד־פעמי</td><td>ארה&quot;ב, עתידים, אופציות</td><td>כן</td><td>❌ חובה כרטיס אשראי</td><td>לא אומת</td><td>⚠️ אין ACAO</td><td>לא אומת</td><td>לא אומת (JS)</td><td>📄 401</td></tr>
+<tr><td><strong>dxFeed demo</strong> (A2)</td><td>~15 דק&#39; (נמדד)</td><td>לא פורסמו; ≤8,000 נרות לבקשה</td><td>ארה&quot;ב נבדקה</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>✅ <code>*</code></td><td>אין תנאים ל־demo; &quot;for testing&quot;</td><td>הצעת מחיר בלבד</td><td>✅ AAPL 335.70 + bid/ask</td></tr>
+<tr><td><strong>Intrinio</strong> (A2)</td><td>Sandbox מוגבל</td><td>ניסיון 14 יום</td><td>ארה&quot;ב</td><td>כן</td><td>~‎$150/חודש (לא אומת)</td><td>לא אומת</td><td>✅ <code>*</code></td><td>לא אומת</td><td>~‎$150 (לא אומת)</td><td>📄 401</td></tr>
+<tr><td><strong>Barchart OnDemand</strong> (A2)</td><td>לא אומת</td><td>לא אומת</td><td>ארה&quot;ב</td><td>כן</td><td>דף לא נטען</td><td>לא אומת</td><td>לא נבדק</td><td>לא אומת</td><td>לא אומת</td><td>📄 401</td></tr>
+<tr><td><strong>Yahoo Finance chart v8</strong> (A3, A4, עורך)</td><td>NASDAQ ~1–2 שנ&#39;; TASE/LSE 20 דק&#39; (נמדד 15 ל־TEVA.TA); Xetra/Paris/HK 15; טוקיו 20</td><td>לא פורסמו; 30 רצופות עברו; 429 בלי UA; A4: 429 מ־query1</td><td>ארה&quot;ב, TASE, אירופה, אסיה</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌ אין ACAO</td><td>אוסר איסוף אוטומטי</td><td>אין API בתשלום</td><td>✅ (3 עובדים + העורך 17:02:28Z)</td></tr>
+<tr><td><strong>Yahoo options v7</strong> (A4, A3)</td><td>~15 דק&#39; (OPRA 15 דק&#39; בטבלת Yahoo)</td><td>לא פורסמו; crumb+cookie</td><td>אופציות ארה&quot;ב</td><td>crumb (בלי חשבון)</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌</td><td>כמו Yahoo</td><td>—</td><td>✅ 23 פקיעות</td></tr>
+<tr><td><strong>Yahoo screener</strong> (A3, A4)</td><td>קרוב לזמן אמת (לא נמדד)</td><td>לא פורסמו</td><td>ארה&quot;ב</td><td>crumb (A3: עבד גם בלי)</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌</td><td>כמו Yahoo</td><td>—</td><td>✅ day_gainers</td></tr>
+<tr><td><strong>Stooq</strong> (A3, A4, עורך)</td><td>—</td><td>—</td><td>—</td><td>לא</td><td>—</td><td>—</td><td>—</td><td>לא אומת</td><td>—</td><td>❌ 404 + אתגר JS (גם העורך 17:02:30Z)</td></tr>
+<tr><td><strong>Nasdaq.com <code>api.nasdaq.com</code></strong> (A3)</td><td>&lt;1 דק&#39; (<code>isRealTime:true</code>, Nasdaq Last Sale)</td><td>לא פורסמו; 30 רצופות עברו; חובה UA</td><td>ארה&quot;ב</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌ אין ACAO</td><td>&quot;personal, non-commercial&quot;</td><td>אין</td><td>✅ bid/ask 336.11/336.16</td></tr>
+<tr><td><strong>Cboe delayed JSON</strong> (A3, A4)</td><td>~15 דק&#39; (נמדד 15.7)</td><td>לא פורסמו; CDN s-maxage=5</td><td>ארה&quot;ב, מניות+אופציות</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌ אין ACAO</td><td>&quot;personal non-commercial use&quot;</td><td>LiveVol (לא נבדק)</td><td>✅ 3,568 חוזים</td></tr>
+<tr><td><strong>Cboe All Access API</strong> (A4)</td><td>תלוי במנויי SIP</td><td>ניסיון 500 נק&#39;/יום ל־14 יום</td><td>ארה&quot;ב</td><td>חשבון</td><td>❌ כרטיס אשראי</td><td>לא אומת</td><td>—</td><td>—</td><td>‎$599/חודש Tier 1 (לא אומת ישירות)</td><td>📄</td></tr>
+<tr><td><strong>TradingView scanner</strong> (A3)</td><td>15 דק&#39; (<code>delayed_streaming_900</code>)</td><td>לא פורסמו</td><td>ארה&quot;ב + עשרות שווקים</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>✅ משקף Origin (body כ־text/plain)</td><td>display-only; אסור מסחרי</td><td>לא נבדק</td><td>✅</td></tr>
+<tr><td><strong>Finviz</strong> (A3)</td><td>~1 דק&#39; (&quot;delayed by 1 minute&quot;)</td><td>export רק ב־Elite</td><td>ארה&quot;ב</td><td>לא (Elite לייצוא)</td><td>Elite: כרטיס אשראי</td><td>לא נמצאה הגבלה</td><td>❌ scrape HTML</td><td>לא אומת (ToS 404)</td><td>Elite ‎$39.50/חודש</td><td>✅ scrape</td></tr>
+<tr><td><strong>Google Finance</strong> (A3)</td><td>מחיר תואם זמן אמת; TASE 20 דק&#39;</td><td>אין API</td><td>ארה&quot;ב, TASE, אירופה, אסיה</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌</td><td>אסור להעתיק/לאחסן/להפיץ</td><td>—</td><td>✅ scrape</td></tr>
+<tr><td><strong>CNBC <code>quote.htm</code></strong> (A3)</td><td>&lt;1 דק&#39; (<code>realTime:&quot;true&quot;</code>)</td><td>לא פורסמו</td><td>ארה&quot;ב (ועוד, לא נבדק)</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>✅ <code>*</code></td><td>לא אומת (403)</td><td>—</td><td>✅ (<code>restQuote.htm</code> ❌ 404)</td></tr>
+<tr><td><strong>TASE DataHub (רשמי)</strong> (A4)</td><td>לא אומת</td><td>4 מוצרים חינמיים; מכסות לא פורסמו</td><td>TASE</td><td>כן (פורטל OIDC)</td><td>לא ידוע (פורטל סגור)</td><td>בורסה ישראלית</td><td>לא נבדק</td><td>לא אומת</td><td>לא אומת</td><td>📄 401</td></tr>
+<tr><td><strong><code>api.tase.co.il</code> (לא רשמי)</strong> (A4)</td><td>סוף יום נבדק; תוך־יומי לא נבדק</td><td>לא פורסמו; Incapsula</td><td>TASE</td><td>לא (רק <code>Referer</code>)</td><td>אין</td><td>ישראלי</td><td>❌ 403 עם Origin זר</td><td>לא נמצא</td><td>—</td><td>✅ TEVA 11990 אג&#39;</td></tr>
+<tr><td><strong>Maya (<code>mayaapi.tase.co.il</code>)</strong> (A4)</td><td>—</td><td>—</td><td>דיווחי חברות</td><td>—</td><td>—</td><td>—</td><td>—</td><td>לא נמצא</td><td>—</td><td>❌ security violation</td></tr>
+<tr><td><strong>Investing.com</strong> (A4)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>אוסר scraping (לא אומת)</td><td>—</td><td>❌ 403</td></tr>
+<tr><td><strong>Börse Frankfurt <code>api.boerse-frankfurt.de</code></strong> (A4)</td><td>כמעט בזמן אמת? (לא אומת)</td><td>לא פורסמו</td><td>Xetra/Frankfurt</td><td>לא</td><td>אין</td><td>לא נמצאה הגבלה</td><td>❌ 403 עם Origin זר</td><td>לא נבדק</td><td>—</td><td>✅ SAP 188.02</td></tr>
+<tr><td><strong>Euronext live</strong> (A4)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>❌ תגובה מוצפנת</td></tr>
+<tr><td><strong>optionsDX</strong> (A4)</td><td>קבצי סוף יום</td><td>10 מוצרים ב־$0</td><td>אופציות ארה&quot;ב</td><td>כנראה חשבון</td><td>לא אומת</td><td>לא אומת</td><td>—</td><td>לא נבדק</td><td>חבילות בתשלום</td><td>📄</td></tr></tbody></table></div>
+<h3 id="מטריצת-צרכים-1-6">מטריצת צרכים 1–6</h3>
+<p>הצרכים: 1 מחיר עדכני · 2 היסטוריה ≥5 שנים · 3 נפח + bid/ask · 4 כיסוי בורסות · 5 עולות/יורדות · 6 אופציות.</p>
+<div class="tbl"><table><thead><tr><th>מקור</th><th>1. מחיר עדכני</th><th>2. היסטוריה ≥5 שנים</th><th>3. נפח + bid/ask</th><th>4. כיסוי</th><th>5. עולות/יורדות</th><th>6. אופציות</th></tr></thead><tbody><tr><td>Alpha Vantage</td><td>❌ סוף יום</td><td>✅ 20+ שנה יומי (6,773 ימים ל־IBM); תוך־יומי בתשלום</td><td>חלקי: נפח; bid/ask בתשלום</td><td>✅ גלובלי</td><td>✅ <code>TOP_GAINERS_LOSERS</code> (מלא במניות פני)</td><td>✅ <code>HISTORICAL_OPTIONS</code> סוף יום עם Greeks</td></tr>
+<tr><td>Finnhub</td><td>✅ זמן אמת (לא אומת)</td><td>חלקי: נרות בתשלום (לא אומת)</td><td>חלקי: נפח, בלי bid/ask</td><td>חלקי: ארה&quot;ב</td><td>❌</td><td>❌ בתשלום</td></tr>
+<tr><td>Twelve Data</td><td>✅ כדקה</td><td>✅ יומי מ־2006, 1-min</td><td>חלקי: נפח חשוד כלא מאוחד; בלי bid/ask</td><td>חלקי: ארה&quot;ב</td><td>❌ בתשלום (לא אומת)</td><td>❌</td></tr>
+<tr><td>Massive</td><td>❌ סוף יום</td><td>חלקי: שנתיים (כולל minute)</td><td>חלקי: נפח; bid/ask בתשלום</td><td>חלקי: ארה&quot;ב</td><td>❌ בתשלום (לא אומת)</td><td>חלקי: Options Basic סוף יום, 5 לדקה, בלי Greeks/quotes</td></tr>
+<tr><td>FMP</td><td>❌ סוף יום</td><td>✅ 5 שנים (לא אומת)</td><td>חלקי</td><td>חלקי</td><td>לא אומת</td><td>❌</td></tr>
+<tr><td>Tiingo</td><td>❌ סוף יום</td><td>✅ 30+ שנה</td><td>חלקי: bid/ask IEX רק ב־Power</td><td>חלקי</td><td>❌</td><td>❌</td></tr>
+<tr><td>EODHD</td><td>חלקי: 15 דק&#39;</td><td>❌ שנה אחת בחינם</td><td>חלקי: נפח מאוחד, בלי bid/ask</td><td>✅ גלובלי</td><td>❌</td><td>❌ בתשלום</td></tr>
+<tr><td>Marketstack</td><td>❌ סוף יום</td><td>❌ שנה אחת</td><td>חלקי: נפח</td><td>✅</td><td>❌</td><td>❌</td></tr>
+<tr><td>Alpaca Basic</td><td>חלקי: IEX בזמן אמת</td><td>✅ מ־2016 כולל 1-min</td><td>חלקי: bid/ask IEX; נפח SIP באיחור</td><td>חלקי: ארה&quot;ב</td><td>✅ <code>movers</code> (לא אומת אם פתוח ל־Basic)</td><td>חלקי: indicative feed</td></tr>
+<tr><td>Tradier Sandbox</td><td>❌ 15 דק&#39;</td><td>✅ יומי לכל חיי המניה; 1-min ל־20 יום</td><td>✅</td><td>חלקי: ארה&quot;ב</td><td>❌</td><td>✅ שרשראות באיחור</td></tr>
+<tr><td>IBKR</td><td>✅ (חשבון ממומן)</td><td>✅</td><td>✅</td><td>✅ גלובלי כולל ת&quot;א</td><td>חלקי: סורקים</td><td>בתשלום</td></tr>
+<tr><td>Schwab</td><td>✅ (ללקוחות)</td><td>✅</td><td>✅</td><td>חלקי</td><td>✅ movers</td><td>✅</td></tr>
+<tr><td>Webull</td><td>בתשלום</td><td>לא אומת</td><td>לא אומת</td><td>חלקי</td><td>לא אומת</td><td>בתשלום</td></tr>
+<tr><td>moomoo OpenD</td><td>✅ (מבצע)</td><td>חלקי: 100 סימבולים לשבוע</td><td>✅</td><td>חלקי: ארה&quot;ב, HK, סין</td><td>לא אומת</td><td>חלקי</td></tr>
+<tr><td>Databento</td><td>בתשלום</td><td>✅ בתשלום</td><td>✅ tick + ספר פקודות</td><td>חלקי: ארה&quot;ב</td><td>❌</td><td>בתשלום</td></tr>
+<tr><td>dxFeed demo</td><td>חלקי: 15 דק&#39;</td><td>✅ יומי מ־1994; 1-min ~2 שבועות</td><td>✅ bid/ask + נפח יומי</td><td>חלקי: ארה&quot;ב</td><td>❌</td><td>לא נבדק</td></tr>
+<tr><td>Intrinio</td><td>חלקי: sandbox</td><td>לא אומת</td><td>לא אומת</td><td>ארה&quot;ב</td><td>לא אומת</td><td>בתשלום</td></tr>
+<tr><td>Barchart</td><td>לא אומת</td><td>לא אומת</td><td>לא אומת</td><td>לא אומת</td><td>לא אומת</td><td>לא אומת</td></tr>
+<tr><td>Yahoo chart v8</td><td>✅ זמן אמת (Nasdaq) / 15–20 דק&#39; בחו&quot;ל</td><td>✅ מ־1984 (AAPL), TEVA.TA מ־2002; 1m ל־30 יום, 5m ל־60 יום</td><td>חלקי: נפח כן; bid/ask (v7) לא אמין: 333.12/339.32 מול 336.02</td><td>✅ כולל TASE</td><td>✅ screener</td><td>✅ v7</td></tr>
+<tr><td>Yahoo options v7</td><td>—</td><td>❌</td><td>✅ bid/ask/OI/vol/IV, בלי Greeks</td><td>חלקי: ארה&quot;ב</td><td>—</td><td>✅</td></tr>
+<tr><td>Stooq</td><td>❌ חסום</td><td>❌</td><td>❌</td><td>❓</td><td>❌</td><td>❌</td></tr>
+<tr><td>Nasdaq.com</td><td>✅ &lt;1 דק&#39;</td><td>✅ 10 שנים (2,513 שורות)</td><td>✅ נפח + bid/ask + size</td><td>חלקי: ארה&quot;ב</td><td>✅ marketmovers כולל מניות פני</td><td>חלקי (לא נבדק)</td></tr>
+<tr><td>Cboe delayed JSON</td><td>חלקי: 15 דק&#39;</td><td>❌</td><td>✅ bid/ask + size</td><td>חלקי: ארה&quot;ב</td><td>❌</td><td>✅ שרשרת מלאה + Greeks</td></tr>
+<tr><td>Cboe All Access</td><td>נפסל (כרטיס אשראי)</td><td>נפסל</td><td>נפסל</td><td>נפסל</td><td>נפסל</td><td>נפסל</td></tr>
+<tr><td>TradingView scanner</td><td>חלקי: 15 דק&#39;</td><td>❌</td><td>חלקי: bid/ask = null</td><td>✅ רב־שווקי</td><td>✅ מיון (צריך סינון OTC)</td><td>❌</td></tr>
+<tr><td>Finviz</td><td>✅ ~1 דק&#39;</td><td>❌ export בתשלום</td><td>חלקי: נפח בלבד</td><td>חלקי: ארה&quot;ב</td><td>✅ <code>ta_topgainers</code></td><td>❌</td></tr>
+<tr><td>Google Finance</td><td>✅</td><td>❌</td><td>חלקי</td><td>✅</td><td>חלקי (scrape)</td><td>❌</td></tr>
+<tr><td>CNBC</td><td>✅</td><td>❌ (לא נבדק)</td><td>חלקי: נפח, בלי bid/ask</td><td>חלקי</td><td>❌</td><td>❌</td></tr>
+<tr><td>TASE DataHub</td><td>? לא נבדק</td><td>?</td><td>?</td><td>חלקי: TASE</td><td>?</td><td>❌</td></tr>
+<tr><td><code>api.tase.co.il</code></td><td>חלקי: סוף יום</td><td>✅ EOD מ־2000 (לפי TASE)</td><td>חלקי: מחזור כן, bid/ask לא נמצא</td><td>חלקי: TASE</td><td>?</td><td>❌</td></tr>
+<tr><td>Maya</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td>Investing.com</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td>Börse Frankfurt</td><td>✅?</td><td>?</td><td>חלקי: מחזור</td><td>חלקי: גרמניה</td><td>?</td><td>❌</td></tr>
+<tr><td>Euronext live</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td>optionsDX</td><td>❌</td><td>חלקי: קבצים</td><td>?</td><td>חלקי</td><td>❌</td><td>חלקי: EOD</td></tr></tbody></table></div>
+<h3 id="פירוט-לכל-מקור">פירוט לכל מקור</h3>
+<h4 id="ספקים-רשמיים-עם-מפתח-a1">ספקים רשמיים עם מפתח (A1)</h4>
+<p><strong>1. Alpha Vantage</strong> — <a href="https://www.alphavantage.co" target="_blank" rel="noopener">https://www.alphavantage.co</a></p>
+<ul>
+<li><strong>איחור:</strong> בחינם סוף יום בלבד. <code>TIME_SERIES_INTRADAY</code> מסומן Premium: &quot;If you would like to access realtime, 15-minute delayed, and/or historical intraday data, please subscribe to a premium membership plan&quot; (<a href="https://www.alphavantage.co/documentation/" target="_blank" rel="noopener">documentation</a>) (אומת היום). <code>GLOBAL_QUOTE</code> החזיר <code>latest trading day: 2026-10-06</code> בזמן שהבורסה פתוחה ב־10-07 (A1, וגם בדיקת העורך ב־17:02:31Z: IBM 221.29, אותו יום).</li>
+<li><strong>מגבלות:</strong> &quot;25 API requests per day&quot; (<a href="https://www.alphavantage.co/support/" target="_blank" rel="noopener">support</a>, <a href="https://www.alphavantage.co/premium/" target="_blank" rel="noopener">premium</a>) (אומת היום).</li>
+<li><strong>היסטוריה:</strong> <code>TIME_SERIES_DAILY</code> עם <code>outputsize=full</code> ל־IBM: 6,773 ימים מ־1999-11-01 (אומת היום).</li>
+<li><strong>bid/ask:</strong> בתשלום. <strong>עולות/יורדות:</strong> <code>TOP_GAINERS_LOSERS</code> עבד עם demo, הרשימה מלאה במניות פני (<code>NMCO^</code> ‎$0.02) (אומת היום). <strong>אופציות:</strong> <code>HISTORICAL_OPTIONS</code> עובד עם demo <strong>רק ל־IBM</strong>, מחזיר שרשרת של יום המסחר הקודם עם bid/ask/size/OI/IV/Greeks (2,112 חוזים, 1.4MB); <code>REALTIME_OPTIONS</code> בתשלום (600 בקשות לדקה ומעלה) (A1+A4, אומת היום). פקודה: <code>curl -s &#39;https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&amp;symbol=IBM&amp;apikey=demo&#39;</code> → 200, 1.4MB.</li>
+<li><strong>מפתח:</strong> טופס אימייל (<a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener">support#api-key</a>). <strong>פוסלים:</strong> לא נמצאו. <strong>ישראל:</strong> לא נמצאה הגבלה.</li>
+<li><strong>CORS:</strong> <code>access-control-allow-origin: *</code> (אומת היום).</li>
+<li><strong>ToS</strong> (<a href="https://www.alphavantage.co/terms_of_service/" target="_blank" rel="noopener">PDF</a>): &quot;for personal, non-commercial use, unless you and Alpha Vantage have agreed otherwise in writing&quot; (אומת היום).</li>
+<li><strong>תוכנית זולה:</strong> ‎$49.99/חודש, 75 לדקה; זמן אמת דורש entitlement (<a href="https://www.alphavantage.co/premium/" target="_blank" rel="noopener">premium</a>) (אומת היום).</li>
+<li><strong>בדיקה חיה:</strong> ✅ (demo עובד על IBM בלבד; AAPL מחזיר &quot;demo purposes only&quot;).</li>
+</ul>
+<pre><code>curl &quot;https://www.alphavantage.co/query?function=GLOBAL_QUOTE&amp;symbol=IBM&amp;apikey=demo&quot;
+→ &quot;05. price&quot;: &quot;221.2900&quot;, &quot;06. volume&quot;: &quot;3938659&quot;, &quot;07. latest trading day&quot;: &quot;2026-10-06&quot;   (A1 ~16:55Z; העורך 17:02:31Z זהה)
+</code></pre>
+<p><strong>2. Finnhub</strong> — <a href="https://finnhub.io" target="_blank" rel="noopener">https://finnhub.io</a></p>
+<ul>
+<li><strong>איחור:</strong> האתר: &quot;Free realtime APIs for stock, forex and cryptocurrency&quot; (<a href="https://finnhub.io/pricing" target="_blank" rel="noopener">pricing</a>). זמן אמת למניות ארה&quot;ב בחינם לפי תוצאת חיפוש (לא אומת, דף התמחור ב־JS).</li>
+<li><strong>מגבלות:</strong> 60 לדקה לפי תוצאת חיפוש (<strong>לא אומת, ללא קישור</strong>).</li>
+<li><strong>demo:</strong> אין. <code>sandbox_c0</code> החזיר <code>401 Invalid API key</code> (אומת היום). נרות, אופציות ו־bid/ask: Premium לפי זיכרון העובד (לא אומת).</li>
+<li><strong>CORS:</strong> <code>*</code> (אומת היום). <strong>ToS</strong> (<a href="https://finnhub.io/terms-of-service" target="_blank" rel="noopener">terms</a>): &quot;All plan listed on Finnhub website is strictly for personal use&quot;, &quot;agree to not redistribute or share access to data&quot; (אומת היום).</li>
+<li><strong>תוכנית זולה:</strong> לא אומת. <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<pre><code>curl &quot;https://finnhub.io/api/v1/quote?symbol=AAPL&amp;token=sandbox_c0&quot; → HTTP 401 {&quot;error&quot;:&quot;Invalid API key.&quot;}
+</code></pre>
+<p><strong>3. Twelve Data</strong> — <a href="https://twelvedata.com" target="_blank" rel="noopener">https://twelvedata.com</a></p>
+<ul>
+<li><strong>איחור:</strong> Basic: &quot;US equities: Real-time&quot; (<a href="https://twelvedata.com/pricing" target="_blank" rel="noopener">pricing</a>). נמדד: נר דקה אחרון <code>12:51:00 ET</code> נשלף ב־12:52 ET, <code>last_quote_at</code> = 16:52 UTC (אומת היום).</li>
+<li><strong>⚠️ נפח:</strong> 582,479 מול 13,885,872 ב־EODHD באותו רגע. כנראה בורסה אחת ולא SIP (לא אומת בתיעוד). לא להשתמש בנפח הזה לנזילות.</li>
+<li><strong>מגבלות:</strong> 8 קרדיטים לדקה, 800 ביום (אומת היום). <strong>היסטוריה:</strong> <code>time_series</code> יומי עם <code>outputsize=5000</code> מ־2006-11-20; 1-min עובד עם demo (אומת היום).</li>
+<li><strong>bid/ask:</strong> אין. <strong>עולות/יורדות:</strong> <code>market_movers</code> בתוכניות גבוהות (לא אומת). <strong>אופציות:</strong> לא בחינם (לא אומת).</li>
+<li><strong>מפתח:</strong> &quot;No credit card required&quot; (אומת היום). <strong>ישראל:</strong> רק &quot;export … to prohibited countries&quot; (סעיף 13.3).</li>
+<li><strong>CORS:</strong> <code>*</code>. <strong>ToS</strong> (<a href="https://twelvedata.com/terms" target="_blank" rel="noopener">terms</a>): &quot;solely for Internal Use&quot; (2.1), אסור &quot;Use Free Tier data for commercial purposes&quot; (2.3(l)), הפצה רק עם Redistribution Add-On (2.2(e)) (אומת היום).</li>
+<li><strong>תוכנית זולה:</strong> Grow ‎$79/חודש (‎$66 שנתי), 20+ שווקים (אומת היום). <strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl &quot;https://api.twelvedata.com/price?symbol=AAPL&amp;apikey=demo&quot;  → {&quot;price&quot;:&quot;336.11&quot;}   (16:52 UTC)
+curl &quot;https://api.twelvedata.com/quote?symbol=AAPL&amp;apikey=demo&quot;
+→ &quot;close&quot;:&quot;336.04&quot;,&quot;volume&quot;:&quot;582479&quot;,&quot;previous_close&quot;:&quot;333.63000&quot;,&quot;last_quote_at&quot;:1791391920,&quot;is_market_open&quot;:true
+</code></pre>
+<p><strong>4. Massive (לשעבר Polygon.io)</strong> — <a href="https://massive.com" target="_blank" rel="noopener">https://massive.com</a></p>
+<ul>
+<li><strong>מותג:</strong> Polygon.io שינה שם ל־Massive ב־30.10.2025 (<a href="https://www.einpresswire.com/article/863823068/polygon-io-is-now-massive" target="_blank" rel="noopener">einpresswire</a>, <a href="https://fisd.net/polygon-io-is-now-massive" target="_blank" rel="noopener">FISD</a>) (לא אומת באתר הרשמי). <code>api.polygon.io</code> ו־<code>api.massive.com</code> עונים זהה (אומת היום).</li>
+<li><strong>מניות:</strong> Stocks Basic חינמי: &quot;End of day data&quot;, 5 לדקה, שנתיים היסטוריה כולל minute aggregates; Starter ‎$29/חודש: 15 דק&#39; איחור, קריאות ללא הגבלה, 5 שנים, WebSocket (<a href="https://massive.com/pricing" target="_blank" rel="noopener">pricing</a>) (אומת היום).</li>
+<li><strong>אופציות</strong> (A4, <a href="https://massive.com/pricing?product=options" target="_blank" rel="noopener">pricing?product=options</a>, אומת היום): Options Basic $0: <code>&quot;5 API Calls / Minute&quot;</code>, <code>&quot;End of Day Data&quot;</code>, <code>&quot;2 Years&quot;</code>, <code>&quot;greeks&quot;:&quot;unavailable&quot;</code>, <code>&quot;quotes&quot;:&quot;unavailable&quot;</code>; Options Starter ‎$29/חודש: ללא הגבלת קריאות, 15 דק&#39;, Greeks, snapshot, בלי quotes; Developer ‎$79.</li>
+<li><strong>ישראל:</strong> ToS דורשים &quot;not located in a country that is subject to a U.S. Government embargo&quot; (<a href="https://massive.com/legal/individuals-terms-of-service" target="_blank" rel="noopener">individuals ToS</a>). ישראל לא ביניהן.</li>
+<li><strong>CORS:</strong> משקף Origin (אומת היום). <strong>ToS:</strong> &quot;solely for your own personal, non-commercial, and non-business purposes&quot; (אומת היום).</li>
+<li><strong>בדיקה חיה:</strong> 📄 אין demo.</li>
+</ul>
+<pre><code>curl &quot;https://api.massive.com/v2/aggs/ticker/AAPL/prev?apiKey=demo&quot; → HTTP 401 {&quot;status&quot;:&quot;ERROR&quot;,&quot;error&quot;:&quot;Unknown API Key&quot;}
+curl &quot;https://api.massive.com/v3/snapshot/options/AAPL?apiKey=DEMO&quot; → 401 (A4)
+</code></pre>
+<p><strong>5. Financial Modeling Prep (FMP)</strong> — <a href="https://site.financialmodelingprep.com" target="_blank" rel="noopener">https://site.financialmodelingprep.com</a></p>
+<ul>
+<li>Basic: &quot;End of Day Historical Data&quot;, &quot;250 Calls / Day&quot;, 5 שנים (<a href="https://site.financialmodelingprep.com/pricing-plans" target="_blank" rel="noopener">pricing-plans</a>, <a href="https://site.financialmodelingprep.com/faqs" target="_blank" rel="noopener">FAQ</a>) — <strong>לא אומת</strong>: האתר החזיר 403 ל־curl ול־WebFetch.</li>
+<li>&quot;no credit card to sign up&quot; (<a href="https://site.financialmodelingprep.com/education/other/do-you-need-a-credit-card-to-use-financial-modeling-prep" target="_blank" rel="noopener">מאמר</a>) (לא אומת). ToS, ישראל, תוכנית זולה: לא אומת (403).</li>
+<li><strong>CORS:</strong> <code>*</code> (אומת היום). <strong>בדיקה חיה:</strong> ❌.</li>
+</ul>
+<pre><code>curl &quot;https://financialmodelingprep.com/stable/quote?symbol=AAPL&amp;apikey=demo&quot; → HTTP 401 {&quot;Error Message&quot;:&quot;Invalid API KEY. ...&quot;}
+</code></pre>
+<p><strong>6. Tiingo</strong> — <a href="https://www.tiingo.com" target="_blank" rel="noopener">https://www.tiingo.com</a></p>
+<ul>
+<li><strong>איחור:</strong> Starter חינמי = סוף יום; פיד IEX רק ב־Power (<a href="https://www.tiingo.com/about/pricing" target="_blank" rel="noopener">pricing</a>) (אומת היום). הערה: בעבר IEX היה גם בחינם, וזה לא מה שמוצג היום.</li>
+<li><strong>מגבלות:</strong> 50 לשעה, 1,000 ביום, 500 סימבולים בחודש, 1GB (אומת היום). <strong>היסטוריה:</strong> &quot;30+ Years&quot; EOD.</li>
+<li><strong>CORS:</strong> ❌ אין כותרות (אומת היום). <strong>ToS</strong> (מדף התמחור): &quot;Internal use means you may only use the data for your own personal use and you may not display or share the data&quot;. הקישור הנכון לתנאים: <a href="https://www.tiingo.com/tos" target="_blank" rel="noopener">tiingo.com/tos</a> (<code>/about/terms</code> החזיר 404).</li>
+<li><strong>תוכנית זולה:</strong> Power ‎$30/חודש לאדם פרטי: 10,000 לשעה, פיד IEX עם bid/ask של IEX (אומת היום). <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<pre><code>curl &quot;https://api.tiingo.com/iex/aapl?token=demo&quot; → HTTP 403 {&quot;detail&quot;:&quot;Invalid token.&quot;}
+</code></pre>
+<p><strong>7. EODHD</strong> — <a href="https://eodhd.com" target="_blank" rel="noopener">https://eodhd.com</a></p>
+<ul>
+<li><strong>איחור:</strong> &quot;Prices are delayed: 15-20 minutes for stocks&quot; (<a href="https://eodhd.com/financial-apis/live-realtime-stocks-api" target="_blank" rel="noopener">live API</a>). נמדד: בקשה ב־16:52 UTC החזירה <code>timestamp</code> 16:37 UTC (אומת היום).</li>
+<li><strong>מגבלות:</strong> 20 ביום (+500 בונוס), 20 לדקה (<a href="https://eodhd.com/pricing" target="_blank" rel="noopener">pricing</a>). היסטוריה בחינם: שנה. demo על AAPL החזיר 11,546 ימים מ־1980, אבל demo ≠ חינמי (אומת היום).</li>
+<li><strong>נפח:</strong> 13,885,872, מאוחד. <strong>bid/ask:</strong> אין. <strong>TASE:</strong> לא אומת.</li>
+<li><strong>CORS:</strong> ⚠️ יש <code>allow-credentials/methods/headers</code> אבל <strong>אין <code>allow-origin</code></strong> → דפדפן יחסום (אומת היום).</li>
+<li><strong>ToS</strong> (<a href="https://eodhd.com/financial-apis/terms-conditions" target="_blank" rel="noopener">terms</a>): &quot;store, manipulate, and analyze the data for private, non-commercial purposes&quot;; אסור &quot;Selling, reselling, retransmitting, redistributing, displaying&quot; (אומת היום).</li>
+<li><strong>תוכנית זולה:</strong> Historian ‎£19.99/חודש, EOD בלבד (אומת היום). <strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl &quot;https://eodhd.com/api/real-time/AAPL.US?api_token=demo&amp;fmt=json&quot;
+→ {&quot;code&quot;:&quot;AAPL.US&quot;,&quot;timestamp&quot;:1791391020,&quot;close&quot;:335.42,&quot;volume&quot;:13885872,&quot;previousClose&quot;:333.63}
+</code></pre>
+<p><strong>8. Marketstack</strong> — <a href="https://marketstack.com" target="_blank" rel="noopener">https://marketstack.com</a></p>
+<ul>
+<li>בחינם: סוף יום, <strong>100 בקשות לחודש</strong>, שנה היסטוריה; 2,700+ בורסות (<a href="https://marketstack.com/pricing" target="_blank" rel="noopener">pricing</a>) (אומת היום).</li>
+<li>ToS מפנים ל־<a href="https://www.ideracorp.com/legal/APILayer" target="_blank" rel="noopener">ideracorp.com/legal/APILayer</a>, לא נקראו. <strong>CORS:</strong> <code>*</code>.</li>
+<li><strong>תוכנית זולה:</strong> Basic ‎$9.99/חודש: 10,000 בחודש, תוך־יומי IEX, 10 שנים (אומת היום). <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<pre><code>curl &quot;https://api.marketstack.com/v2/eod/latest?access_key=demo&amp;symbols=AAPL&quot; → HTTP 401 invalid_access_key
+</code></pre>
+<h4 id="ברוקרים-ושירותים-דמויי-ברוקר-a2">ברוקרים ושירותים דמויי־ברוקר (A2)</h4>
+<p><strong>9. Alpaca Markets — Market Data API (Basic)</strong></p>
+<ul>
+<li><strong>איחור:</strong> real-time <strong>רק מ־IEX</strong>; SIP בחינם רק באיחור: &quot;Historical data limitation: latest 15 minutes&quot; (<a href="https://docs.alpaca.markets/docs/about-market-data-api" target="_blank" rel="noopener">About Market Data API</a>, <a href="https://docs.alpaca.markets/docs/historical-stock-data-1" target="_blank" rel="noopener">Historical Stock Data</a>: &quot;iex … This is the only feed that can be used without a subscription&quot;). דף התמחור: &quot;Real-time: Yes, via websocket / 15 minute delay via API&quot; (<a href="https://alpaca.markets/data" target="_blank" rel="noopener">alpaca.markets/data</a>) (אומת היום).</li>
+<li><strong>מגבלות:</strong> 200 לדקה; WebSocket עד 30 סימבולים; לא נמצאה מגבלה יומית (אומת היום). <strong>היסטוריה:</strong> &quot;Since 2016&quot; כולל 1-min.</li>
+<li><strong>bid/ask:</strong> <code>quotes/latest</code> ו־snapshots, IEX בלבד. <strong>עולות/יורדות:</strong> <code>GET /v1beta1/screener/{market_type}/movers?top=N</code> &quot;based on real time SIP data&quot; (<a href="https://docs.alpaca.markets/reference/movers-1" target="_blank" rel="noopener">movers</a>); לא אומת אם פתוח ל־Basic. <strong>אופציות:</strong> &quot;Indicative Pricing Feed&quot; ב־Basic; OPRA רק ב־Algo Trader Plus (אומת היום).</li>
+<li><strong>הרשמה:</strong> &quot;Anyone globally can create an Alpaca Paper Only Account! All you need to do is sign up with your email address&quot; (<a href="https://docs.alpaca.markets/docs/paper-trading" target="_blank" rel="noopener">Paper Trading</a>) (אומת היום). דף ההרשמה (<a href="https://app.alpaca.markets/signup" target="_blank" rel="noopener">signup</a>) הוא JS (לא אומת). רשימת מדינות לחשבון אמיתי (<a href="https://alpaca.markets/support/countries-alpaca-is-available" target="_blank" rel="noopener">Countries</a>) לא נקראה.</li>
+<li><strong>CORS:</strong> <code>Access-Control-Allow-Origin: *</code> + <code>Allow-Headers: Apca-Api-Key-Id, Apca-Api-Secret-Key</code>. <strong>מלכודת:</strong> המפתח הסודי נחשף בדפדפן.</li>
+<li><strong>ToS</strong> (<a href="https://files.alpaca.markets/disclosures/library/TermsAndConditions.pdf" target="_blank" rel="noopener">PDF</a>): &quot;Personal and Non-Commercial Usage – … solely for your own personal and non-commercial purposes&quot; (אומת היום).</li>
+<li><strong>תוכנית זולה:</strong> Algo Trader Plus ‎$99/חודש: SIP בזמן אמת, 10,000 לדקה, OPRA (אומת היום). <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<pre><code>curl -sI -H &#39;Origin: https://example.com&#39; https://data.alpaca.markets/v2/stocks/AAPL/quotes/latest
+HTTP/1.1 401 Unauthorized   Access-Control-Allow-Origin: *   (גם עם מפתח &quot;demo&quot;)
+</code></pre>
+<p><strong>10. Tradier — Developer Sandbox</strong></p>
+<ul>
+<li><strong>איחור:</strong> &quot;We delay our market data the industry standard 15-minutes for all sandbox data&quot;; אין streaming מושהה (<a href="https://docs.tradier.com/docs/market-data.md" target="_blank" rel="noopener">Market Data</a>, <a href="https://docs.tradier.com/docs/market-data" target="_blank" rel="noopener">market-data</a>) (אומת היום, A2+A4).</li>
+<li><strong>מגבלות:</strong> Sandbox 60 לדקה, Production 120 (<a href="https://docs.tradier.com/docs/rate-limiting" target="_blank" rel="noopener">Rate Limiting</a>). <strong>היסטוריה:</strong> יומי &quot;entire lifetime of the company&quot;; 1min ל־20 יום; 5/15min ל־40 יום; אין tick ב־sandbox (<a href="https://docs.tradier.com/docs/historical-data.md" target="_blank" rel="noopener">Historical Data</a>) (אומת היום).</li>
+<li><strong>פוסלים ⚠️ (לא הוכרע):</strong> התיעוד: &quot;All Tradier Brokerage account holders can create a paper trading account&quot; ו־&quot;If you are not a Tradier Brokerage account holder, we are unable to provide you with any real-time data solution&quot; (אומת היום). כתבות מ־2014 תיארו sandbox &quot;no brokerage account required&quot; (<a href="https://venturebeat.com/business/tradier-announces-launch-of-new-free-developer-sandbox-api" target="_blank" rel="noopener">VentureBeat</a>, <a href="https://blog.tradier.com/blog/2014/07/free-developer-sandbox-.html" target="_blank" rel="noopener">Tradier blog</a>). דף ההרשמה (<a href="https://developer.tradier.com/user/sign_up" target="_blank" rel="noopener">developer.tradier.com/user/sign_up</a>, <a href="https://docs.tradier.com/docs/getting-started.md" target="_blank" rel="noopener">Getting Started</a>) הוא JS ולא נקרא (A2, A4). <strong>מסקנת A2: נפסל כחינמי עד שיוכח אחרת.</strong></li>
+<li><strong>הערה (A2):</strong> בקוד לדוגמה הופיע <code>Origin: https://example.com</code> לבדיקת CORS; ב־IBKR ה־Gateway המקומי רץ על <code>https://localhost:5000</code>.</li>
+<li><strong>ישראל:</strong> &quot;150+ countries&quot; (<a href="https://support.tradier.com/are-there-any-requirements-to-open-an-account-at-tradier-brokerage" target="_blank" rel="noopener">support</a>) (לא אומת). <strong>CORS:</strong> <code>*</code>. <strong>תמחור:</strong> Lite $0 / Pro ‎$10 / Pro Plus ‎$35, &quot;API Access: Included&quot; (<a href="https://tradier.com/individuals/pricing" target="_blank" rel="noopener">Pricing</a>) (אומת היום).</li>
+<li><strong>בדיקה חיה:</strong> 📄. <code>GET https://sandbox.tradier.com/v1/markets/quotes?symbols=AAPL</code> → 401 &quot;Invalid access token&quot;; שרשרת אופציות → 401 (A4).</li>
+</ul>
+<p><strong>11. Interactive Brokers — Client Portal Web API / TWS API</strong></p>
+<ul>
+<li>❌ <strong>נפסל כחינמי.</strong> &quot;to use the Trader Workstation, Client Portal or any of our APIs, you do need to have a fully funded account … IBKR Pro and a funded account are required&quot; (<a href="https://www.interactivebrokers.com/campus/?p=203297" target="_blank" rel="noopener">IBKR Campus</a>) (אומת היום). &quot;demo accounts cannot subscribe to data&quot; (<a href="https://www.interactivebrokers.com/docs/web-api/v1/requirements-limitations/introduction" target="_blank" rel="noopener">Web API Requirements</a>) (לא אומת).</li>
+<li>ללקוחות: &quot;free real-time streaming market data on all US-listed stocks and ETFs from Cboe One and IEX (Non-consolidated)&quot;, delayed &quot;usually 10-20 minutes behind&quot;, 100 snapshot בחודש; מנויי נתונים דורשים &quot;Minimum Equity Balance … Individual USD 500.00&quot; (<a href="https://www.interactivebrokers.com/en/pricing/market-data-pricing.php" target="_blank" rel="noopener">Market Data Pricing</a>) (אומת היום).</li>
+<li><strong>תוכנית זולה:</strong> &quot;US Securities Snapshot and Futures Value Bundle&quot; ‎$10/חודש (מתבטל ב־$30 עמלות); OPRA L1 ‎$1.50 (אומת היום). <strong>CORS:</strong> לא רלוונטי, Gateway מקומי. <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<p><strong>12. Charles Schwab Developer Portal (Trader API – Individual)</strong></p>
+<ul>
+<li>❌ <strong>נפסל כחינמי:</strong> חשבון Schwab + thinkorswim, בקשת גישה והמתנה לאישור (<a href="https://cran.nics.utk.edu/cran/web/packages/schwabr/readme/README.html" target="_blank" rel="noopener">schwabr README</a>, <a href="https://wealth-lab.com/Discussion/Schwab-broker-extension-Beta-release-11565" target="_blank" rel="noopener">Wealth-Lab</a>) (לא אומת, מקורות משניים). <a href="https://developer.schwab.com/" target="_blank" rel="noopener">developer.schwab.com</a> הוא JS.</li>
+<li>OAuth עם refresh token שפג אחרי 7 ימים (לא אומת) → שרת. <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<pre><code>curl -sI &#39;https://api.schwabapi.com/marketdata/v1/quotes?symbols=AAPL&#39; → HTTP/2 401 … error=&quot;invalid_token&quot;
+</code></pre>
+<p><strong>13. Webull OpenAPI</strong></p>
+<ul>
+<li>❌ <strong>נפסל כחינמי:</strong> &quot;API applications are typically reviewed within 1–2 business days&quot;, &quot;Market data subscriptions for OpenAPI are purchased separately&quot; (<a href="https://developer.webull.com/apis/docs/faq" target="_blank" rel="noopener">Trading API FAQ</a>) (אומת היום). דרישת חשבון ברוקראז&#39; ב־<a href="https://github.com/webull-inc/webull-openapi-python-sdk" target="_blank" rel="noopener">SDK README</a> (לא אומת). חתימת HMAC → שרת. <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<p><strong>14. moomoo / Futu OpenAPI (OpenD)</strong></p>
+<ul>
+<li>&quot;Without the need for account opening, you can log in to OpenD using your Moomoo account&quot;, ואז &quot;complete API Questionnaire and Agreements&quot; (<a href="https://openapi.moomoo.com/moomoo-api-doc/en/intro/authority.html" target="_blank" rel="noopener">Authorities and Quota</a>) (אומת היום).</li>
+<li>US: &quot;LV3 market quotes for free during promotion period (Nasdaq Basic + TotalView + NYSE Arcabook)&quot;; אופציות ארה&quot;ב בחינם רק עם נכסים &gt;$0. Snapshot: &quot;60 requests every 30 seconds&quot;; מכסת מנויים/היסטוריה 100/100 לשבוע למשתמש מתחת ל־10,000 HKD (אומת היום).</li>
+<li><strong>ישראל:</strong> לפי <a href="https://www.moomoo.com/us/learn/moomoo-available-countries" target="_blank" rel="noopener">Available Countries</a> (לא אומת) ישראל לא ברשימה. <strong>CORS:</strong> ❌ TCP מקומי. <strong>בדיקה חיה:</strong> 📄.</li>
+</ul>
+<p><strong>15. Databento</strong></p>
+<ul>
+<li>&quot;real-time data requires a Standard, Plus, or Unlimited plan&quot;; &quot;Sign up for $125 in free credits&quot; (<a href="https://databento.com/pricing" target="_blank" rel="noopener">pricing</a>) (אומת היום); קרדיט לשימוש היסטורי או חודש ראשון (<a href="https://databento.com/docs/faqs/usage-pricing-and-data-credits" target="_blank" rel="noopener">credits FAQ</a>) (לא אומת).</li>
+<li>❌ <strong>נפסל כחינמי:</strong> &quot;Credit or debit card information is required to verify the authenticity of your account&quot; (<a href="https://databento.com/blog/why-payment-information-required" target="_blank" rel="noopener">blog</a>) (אומת היום). מחיר Standard לא אומת (JS). <strong>CORS:</strong> ⚠️ אין ACAO. <strong>בדיקה חיה:</strong> 📄 (<code>https://hist.databento.com/v0/metadata.list_datasets</code> → 401).</li>
+</ul>
+<p><strong>16. dxFeed — שרת demo ציבורי</strong></p>
+<ul>
+<li><strong>איחור:</strong> ~15 דק&#39; נמדד: שעת שרת 16:54:53 UTC, עסקה אחרונה 16:39:44 UTC. &quot;All demo environments are available without credentials&quot; (<a href="https://kb.dxfeed.com/en/getting-started.html" target="_blank" rel="noopener">KB</a>) (אומת היום).</li>
+<li><strong>היסטוריה:</strong> נרות יומיים מ־1994-12-22 (תקרה 8,000 לבקשה); 1-min כשבועיים. <strong>bid/ask:</strong> אירוע <code>Quote</code> עם גודל ובורסה; <code>Trade</code>/<code>Summary</code> עם dayVolume (אומת היום). סימבולים זרים (<code>TEVA:TA</code>, <code>VOD:LSE</code>) → <code>TIMED_OUT</code>.</li>
+<li><strong>ToS:</strong> אין ל־demo; &quot;for testing purposes with delayed data&quot;. <strong>מלכודת:</strong> אין התחייבות לזמינות. <strong>תמחור:</strong> הצעת מחיר (<a href="https://dxfeed.com/dxfeed-apis/" target="_blank" rel="noopener">dxFeed APIs</a>). <strong>CORS:</strong> <code>*</code>. <strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl &#39;https://demo.dxfeed.com/webservice/rest/events.json?events=Quote,Trade&amp;symbols=AAPL&#39;
+{&quot;status&quot;:&quot;OK&quot;,&quot;Quote&quot;:{&quot;AAPL&quot;:{&quot;bidPrice&quot;:335.68,&quot;bidSize&quot;:40,&quot;askPrice&quot;:335.7,&quot;askSize&quot;:120}},
+ &quot;Trade&quot;:{&quot;AAPL&quot;:{&quot;time&quot;:1791391184907,&quot;price&quot;:335.7,&quot;dayVolume&quot;:1.3966369426749E7}}}
+היסטוריה: events=Candle&amp;symbols=AAPL{=d}&amp;fromTime=19900101-000000
+</code></pre>
+<p><strong>17. Intrinio</strong> — Developer Sandbox (Dow 30), ניסיון 14 יום, תוכניות מ־~‎$150/חודש (<a href="https://about.intrinio.com/developer-sandbox" target="_blank" rel="noopener">Developer Sandbox</a>, <a href="https://www.g2.com/products/intrinio-financial-data-api/pricing" target="_blank" rel="noopener">G2</a>) (לא אומת). <code>https://api-v2.intrinio.com/securities/AAPL/prices/realtime</code> → 401, <code>access-control-allow-origin: *</code>. 📄.</p>
+<p><strong>18. Barchart OnDemand</strong> — <a href="https://www.barchart.com/ondemand/free-market-data-api" target="_blank" rel="noopener">free-market-data-api</a> החזיר תגובה ריקה. <code>https://ondemand.websol.barchart.com/getQuote.json?symbols=AAPL</code> → 401 &quot;API key is missing or not valid.&quot; מעבר לזה לא אומת. 📄.</p>
+<h4 id="מקורות-ציבוריים-ללא-מפתח-ארה-quot-ב-a3">מקורות ציבוריים ללא מפתח, ארה&quot;ב (A3)</h4>
+<p>הבהרה: כל המקורות כאן <strong>לא רשמיים</strong>. אין מסמכי API, אין SLA, והם יכולים להשתנות או להיחסם בלי הודעה. היום זה קרה ל־Stooq ול־<code>restQuote.htm</code> של CNBC. רובם דורשים User-Agent של דפדפן.</p>
+<p><strong>19. Yahoo Finance (לא רשמי)</strong> — מאוחד מ־A3, A4 ובדיקות העורך</p>
+<ul>
+<li><p><strong>איחור:</strong> AAPL: <code>quoteSourceName</code> = &quot;Nasdaq Real Time Price&quot;, <code>exchangeDataDelayedBy</code> = 0. אלה עסקאות Nasdaq בלבד, לא SIP. נמדד: <code>regularMarketTime</code> 16:52:28Z מול שעון 16:52:29Z (כשנייה, A3); 16:53:17 מול 16:53:20 (A4); <strong>בדיקת העורך 17:02:28Z: הנר האחרון 17:02:28Z, הפרש 0 שניות</strong>. TEVA.TA ו־SAP.DE הגיעו עם <code>exchangeDataDelayedBy: 15</code> (A3). טבלת העזרה הרשמית (<a href="https://help.yahoo.com/kb/SLN2310.html" target="_blank" rel="noopener">SLN2310</a>, אומת היום):</p>
+<div class="tbl"><table><thead><tr><th>בורסה</th><th>סיומת</th><th>עיכוב</th></tr></thead><tbody><tr><td>NASDAQ</td><td>—</td><td>Real-time</td></tr>
+<tr><td>Tel Aviv</td><td><code>.TA</code></td><td>20 min</td></tr>
+<tr><td>London</td><td><code>.L</code></td><td>20 min</td></tr>
+<tr><td>XETRA</td><td><code>.DE</code></td><td>15 min</td></tr>
+<tr><td>Euronext Paris</td><td><code>.PA</code></td><td>15 min</td></tr>
+<tr><td>Tokyo</td><td><code>.T</code></td><td>20 min</td></tr>
+<tr><td>Hong Kong</td><td><code>.HK</code></td><td>15 min</td></tr>
+<tr><td>OPRA (אופציות)</td><td>—</td><td>15 min</td></tr></tbody></table></div>
+<p><strong>לא הוכרע:</strong> השדה ל־TEVA.TA אמר 15, הטבלה אומרת 20.</p>
+</li>
+<li><p><strong>היסטוריה (אומת היום):</strong> <code>range=5y&amp;interval=1d</code> → 1,255 נרות (AAPL) / 1,252 (TEVA.TA). ראשית הנתונים: AAPL 1984-12, TEVA.TA 2002-08, LUMI.TA 2007-12, VOD.L 1988, SAP.DE 1998, MC.PA 2000, 7203.T 1999, 0700.HK 2004. <strong><code>range=max</code> מוריד את הרזולוציה</strong>: בדיקת העורך (17:03:42Z) החזירה <code>dataGranularity: 3mo</code>, 169 נרות, גם מ־query1 וגם מ־query2. לנתונים יומיים ארוכים: <code>period1/period2</code> או <code>range=10y</code>. תוך־יומי: <code>1m</code> עד 8 ימים לבקשה ורק ב־30 הימים האחרונים (&quot;Only 8 days worth of 1m granularity data are allowed to be fetched per request&quot;); <code>5m</code> עד 60 יום (4,644 נרות ל־AAPL; 5,517 ל־TEVA.TA); <code>1h</code> 730 יום. TEVA.TA 1m היום: 451 נרות (06:59–14:29 UTC).</p>
+</li>
+<li><p><strong>נפח / bid-ask:</strong> <code>regularMarketVolume</code> 14.6M. v7 <code>bid/ask</code> ל־AAPL: 333.12 / 339.32 כשהמחיר 336.02 → <strong>לא NBBO, לא אמין לספרד</strong> (אומת היום).</p>
+</li>
+<li><p><strong>עולות/יורדות:</strong> <code>https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved?scrIds=day_gainers&amp;count=5&amp;crumb=&lt;CRUMB&gt;</code> → 33 תוצאות (A3: 33, A4 עם count=5: PENG 15.12, BSP 10.43, NWE 8.75, BKH 8.68, BRZE 7.76) (PENG +15.7%, BSP +10.4%). A3: עבד גם בלי crumb; A4: עם crumb. <code>day_losers</code> עובד; <code>most_actives</code> לא נבדק. רק ארה&quot;ב.</p>
+</li>
+<li><p><strong>אופציות (v7):</strong> <code>https://query2.finance.yahoo.com/v7/finance/options/AAPL?crumb=&lt;CRUMB&gt;</code>. בלי crumb: <code>401 Invalid Crumb</code>. crumb: cookie מ־<code>https://fc.yahoo.com</code> ואז <code>/v1/test/getcrumb</code>. שדות: strike, lastPrice, bid, ask, volume, openInterest, impliedVolatility, inTheMoney, lastTradeDate. <strong>אין Greeks, אין היסטוריה.</strong> 23 פקיעות עד 2029-01-19; לכל פקיעה <code>&amp;date=&lt;epoch&gt;</code>. איחור נמדד ~15 דק&#39; (עסקה אחרונה 16:38:04 בשעה 16:53) (אומת היום).</p>
+</li>
+<li><p><strong>מגבלות:</strong> &quot;rate limits at Yahoo&#39;s absolute and sole discretion&quot; (<a href="https://legal.yahoo.com/us/en/yahoo/terms/product-atos/apiforydn/index.html" target="_blank" rel="noopener">API terms</a>). 30 בקשות רצופות עברו. <strong>בלי User-Agent → 429 מיד.</strong> A4: <code>query1</code> החזיר 429 בקריאה ראשונה, <code>query2</code> עבד; A3 והעורך: <code>query1</code> 200 (<strong>לא הוכרע</strong>, כנראה לפי IP).</p>
+</li>
+<li><p><strong>CORS:</strong> ❌ אין ACAO (אומת היום, A3+A4). <strong>ToS</strong> (<a href="https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html" target="_blank" rel="noopener">Yahoo ToS</a>): אסור &quot;access or collect data … using any automated means … robots, spiders, scrapers … for any purpose without our express, prior permission&quot; ו־&quot;may not access or reuse the Services … for any commercial purpose&quot; (אומת היום). README של <a href="https://github.com/ranaroussi/yfinance" target="_blank" rel="noopener">yfinance</a>: &quot;intended for personal use only&quot;.</p>
+</li>
+<li><p><strong>מלכודות:</strong> <code>ILA</code> = אגורות, <code>GBp</code> = פני → לחלק ב־100. מחיר TEVA.TA ב־Yahoo (11990) זהה לסגירה באתר TASE (אומת היום).</p>
+</li>
+<li><p><strong>בדיקה חיה:</strong> ✅.</p>
+</li>
+</ul>
+<pre><code>curl -A &quot;$UA&quot; &#39;https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1m&amp;range=1d&#39;
+→ meta.regularMarketTime=1791391948 (16:52:28Z) price 336.12  (A3)
+→ העורך 17:02:28Z: HTTP 200, price 336.0, dataGranularity 1m, 214 נרות, נר אחרון 17:02:28Z
+query2: curl -s -A &#39;Mozilla/5.0 ...&#39; &#39;https://query2.finance.yahoo.com/v8/finance/chart/&lt;SYM&gt;?interval=1d&amp;range=max&#39;
+  TEVA.TA 200 Tel Aviv ILA price 11990.0 rmt 2026-10-07 14:28 UTC first 2002-08-31  (A4)
+</code></pre>
+<p><strong>20. Stooq</strong> — ❌ נכשל (A3 16:54, A4 16:54:48, העורך 17:02:30Z)</p>
+<ul>
+<li><code>https://stooq.com/q/l/?s=aapl.us&amp;f=sd2t2ohlcv&amp;h&amp;e=csv</code> → <strong>HTTP 404</strong> &quot;The page you requested does not exist or has been moved&quot;, לכל הסיומות (<code>.us .uk .de .jp .hk .ta .fr</code>). גם stooq.pl.</li>
+<li><code>https://stooq.com/q/d/l/?s=aapl.us&amp;i=d</code> → HTTP 200 אבל דף &quot;This site requires JavaScript to verify your browser&quot; (proof-of-work SHA-256 ב־JS), בלי CSV. גם דף הבית ו־<code>/db/h/</code>.</li>
+<li>איחור, מגבלה יומית, כיסוי, ToS: לא נבדקו. <strong>מסקנה: לא להסתמך על Stooq.</strong></li>
+</ul>
+<p><strong>21. Nasdaq.com (<code>api.nasdaq.com</code>, לא רשמי)</strong></p>
+<ul>
+<li><strong>איחור:</strong> <code>isRealTime: true</code>, Nasdaq Last Sale. <code>lastTradeTimestamp</code> &quot;12:52 PM ET&quot; מול 16:52:30Z → פחות מדקה, רזולוציה דקות (אומת היום).</li>
+<li><strong>היסטוריה:</strong> <code>/historical?…&amp;limit=9999</code> → 2,513 שורות = 10 שנים OHLCV; <code>/chart</code> → נרות דקה של היום מ־4:00 ET (534 נקודות) (אומת היום).</li>
+<li><strong>bid/ask:</strong> <code>bidPrice $336.11</code>, <code>askPrice $336.16</code>, <code>bidSize 25</code>, <code>askSize 40</code>, <code>volume 14,590,589</code>. ספרד 5 סנט, נראה אמיתי (אומת היום).</li>
+<li><strong>עולות/יורדות:</strong> <code>/api/marketmovers?assetclass=stocks</code> → <code>MostAdvanced</code>, <code>MostDeclined</code>, <code>MostActiveByShareVolume</code>, <code>MostActiveByDollarVolume</code>, <code>Nasdaq100Movers</code>. היום: SBFM +158.9%, DYNCW +133%, SXTC +128%. כולל warrants ומניות זולות (אומת היום).</li>
+<li><strong>מגבלות:</strong> 30 רצופות עברו. <strong>בלי UA אין תגובה כלל</strong> (timeout). <strong>CORS:</strong> ❌.</li>
+<li><strong>ToS</strong> (<a href="https://www.nasdaq.com/legal" target="_blank" rel="noopener">nasdaq.com/legal</a>): &quot;personal, limited, revocable … license … solely for your personal, non-commercial use. … you agree not to sell, copy, distribute, or create derivative works&quot;; איסור scraping ל־&quot;training or development of artificial intelligence systems&quot; (אומת היום).</li>
+<li><strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl -A &quot;$UA&quot; -H &#39;Accept: application/json&#39; &#39;https://api.nasdaq.com/api/quote/AAPL/info?assetclass=stocks&#39;
+→ &quot;lastSalePrice&quot;:&quot;$336.13&quot;,&quot;lastTradeTimestamp&quot;:&quot;Oct 7, 2026 12:52 PM ET&quot;,&quot;isRealTime&quot;:true,
+   &quot;bidPrice&quot;:&quot;$336.11&quot;,&quot;askPrice&quot;:&quot;$336.16&quot;,&quot;bidSize&quot;:&quot;25&quot;,&quot;askSize&quot;:&quot;40&quot;,&quot;volume&quot;:&quot;14,590,589&quot;
+</code></pre>
+<p><strong>22. Cboe delayed quotes JSON (CDN ציבורי)</strong> — A3 + A4</p>
+<ul>
+<li><strong>איחור:</strong> <code>last_trade_time</code> 12:36:56 ET מול 12:52:39 ET → ~15.7 דק&#39; (A3); 12:38:06 מול 12:53:39 → 15 דק&#39; (A4). <code>timestamp</code> בקובץ הוא זמן יצירה ולא זמן המחיר (אומת היום).</li>
+<li><strong>מניה:</strong> <code>bid 335.35</code>, <code>ask 335.39</code>, <code>bid_size 120</code>, <code>ask_size 80</code>, OHLC, <code>prev_day_close</code>, <code>volume</code>, <code>iv30</code>.</li>
+<li><strong>אופציות:</strong> <code>…/delayed_quotes/options/AAPL.json</code> → <strong>3,568 חוזים</strong>, 1.59MB; לכל חוזה bid/ask/size, iv, open_interest, volume, delta/gamma/vega/theta/rho, theo, last_trade_time. <code>_SPX</code> = 13.4MB. <strong>המקור החינמי היחיד עם שרשרת מלאה + Greeks</strong> (אומת היום).</li>
+<li><strong>טכני:</strong> <code>https://cdn.cboe.com/api/global/delayed_quotes/options/AAPL.json</code> → 307 ל־<code>https://cdn-api.cboe.com/...</code>, צריך <code>curl -L</code>. <code>cache-control: s-maxage=5</code>.</li>
+<li><strong>היסטוריה / עולות־יורדות:</strong> אין. <strong>CORS:</strong> ❌. <strong>ToS</strong> (<a href="https://www.cboe.com/terms" target="_blank" rel="noopener">cboe.com/terms</a>): &quot;view, print and download one copy of the Materials for your personal non-commercial use … may not otherwise copy, reproduce, alter, store … display, broadcast, create a derivative work&quot; (אומת היום). שמירה במסד נתונים = תחום אפור.</li>
+<li><strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl -sL -A &quot;$UA&quot; &#39;https://cdn.cboe.com/api/global/delayed_quotes/quotes/AAPL.json&#39;
+→ {&quot;timestamp&quot;:&quot;2026-10-07 16:52:05&quot;,&quot;data&quot;:{&quot;current_price&quot;:335.365,&quot;bid&quot;:335.35,&quot;ask&quot;:335.39,&quot;bid_size&quot;:120,&quot;ask_size&quot;:80,
+   &quot;volume&quot;:13081621,&quot;last_trade_time&quot;:&quot;2026-10-07T12:36:56&quot;}}
+curl -sL &#39;https://cdn.cboe.com/api/global/delayed_quotes/options/AAPL.json&#39; → 200, 1,588,606 bytes
+   {&quot;option&quot;:&quot;AAPL270115C00250000&quot;,&quot;bid&quot;:88.6,&quot;ask&quot;:90.15,&quot;iv&quot;:0.3485,&quot;open_interest&quot;:24488.0,&quot;delta&quot;:0.9674,...}
+</code></pre>
+<p><strong>23. TradingView scanner (לא רשמי)</strong></p>
+<ul>
+<li><strong>איחור:</strong> <code>update_mode</code> = <code>&quot;delayed_streaming_900&quot;</code> → 15 דק&#39; לאנונימי. <code>close 335.438</code> תואם ל־Cboe המושהה (אומת היום). <strong>bid/ask:</strong> <code>null</code>. <strong>נפח:</strong> 13,891,951.</li>
+<li><strong>עולות/יורדות:</strong> מיון לפי <code>change</code>; בלי סינון מחזיר OTC זניחות (MEGH +14,999,900%). <code>totalCount</code> 11,851. <strong>היסטוריה:</strong> אין. <strong>שווקים אחרים:</strong> <code>/israel/scan</code>, <code>/germany/scan</code> לא נבדקו.</li>
+<li><strong>CORS:</strong> ✅ משקף Origin; preflight מתיר רק <code>Referer,Accept</code> → בדפדפן לשלוח body בלי <code>Content-Type: application/json</code> (לא נבדק בדפדפן אמיתי).</li>
+<li><strong>ToS</strong> (<a href="https://www.tradingview.com/policies/" target="_blank" rel="noopener">policies</a>): &quot;licensed for exclusive display-only use&quot;, &quot;we do not permit commercial usage of any of our services or APIs&quot;, &quot;strictly forbid the sublicensing … or any distribution of TradingView content, including market data&quot; (אומת היום). שימוש מתוכנת = כנראה non-display use אסור.</li>
+<li><strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl -X POST &#39;https://scanner.tradingview.com/america/scan&#39; -H &#39;Content-Type: application/json&#39; \
+ -d &#39;{&quot;symbols&quot;:{&quot;tickers&quot;:[&quot;NASDAQ:AAPL&quot;]},&quot;columns&quot;:[&quot;close&quot;,&quot;volume&quot;,&quot;change&quot;,&quot;bid&quot;,&quot;ask&quot;,&quot;update_mode&quot;]}&#39;
+→ {&quot;data&quot;:[{&quot;s&quot;:&quot;NASDAQ:AAPL&quot;,&quot;d&quot;:[335.438,13891951,0.5419,null,null,&quot;delayed_streaming_900&quot;]}]}
+</code></pre>
+<p><strong>24. Finviz</strong></p>
+<ul>
+<li><strong>איחור:</strong> &quot;Stock quotes delayed by 1 minute. Futures and options delayed by 15 minutes.&quot; (<a href="https://finviz.com/quote.ashx?t=AAPL" target="_blank" rel="noopener">quote.ashx?t=AAPL</a>) (אומת היום). נמדד 336.00 ב־16:55 מול Nasdaq 335.84 ב־12:54 ET.</li>
+<li><strong>עולות/יורדות:</strong> <code>screener.ashx?v=111&amp;s=ta_topgainers</code> (HTML): SXTC, SBFM, PFAI, TOPP, BIYA (אומת היום). <strong>export CSV:</strong> דורש Elite. <strong>היסטוריה/bid-ask/אופציות:</strong> אין בחינם.</li>
+<li><strong>פוסלים:</strong> Elite דורש כרטיס אשראי גם לניסיון (אומת היום). <strong>CORS:</strong> ❌. <strong>ToS:</strong> <code>/terms</code> → 404; מקור משני <a href="https://dev.co/databases/open-source/finviz" target="_blank" rel="noopener">dev.co</a> (לא אומת).</li>
+<li><strong>תוכנית:</strong> Elite ‎$39.50/חודש או ‎$299.50/שנה, זמן אמת + export (<a href="https://finviz.com/elite" target="_blank" rel="noopener">finviz.com/elite</a>) (אומת היום). <strong>בדיקה חיה:</strong> ✅ scrape.</li>
+</ul>
+<pre><code>curl -sL -A &quot;$UA&quot; &#39;https://finviz.com/quote.ashx?t=AAPL&#39; → class=&quot;quote-price_price&quot;&gt;336.00 … &quot;Stock quotes delayed by 1 minute.&quot;
+</code></pre>
+<p><strong>25. Google Finance</strong></p>
+<ul>
+<li><strong>איחור:</strong> <code>$335.89</code> ב־16:55 תואם למחיר החי; חותמת זמן בדף &quot;12:49:46 PM GMT-4&quot; פיגרה ~5.5 דק&#39; (אולי cache) (אומת היום). <a href="https://www.google.com/googlefinance/disclaimer/" target="_blank" rel="noopener">Disclaimer</a>: NASDAQ/NYSE &quot;Realtime&quot;, TASE (TLV) 20 דק&#39; (אומת היום).</li>
+<li><strong>אין API</strong>, scrape שביר (class מוצפן, <code>YMlKec</code>). <strong>CORS:</strong> ❌.</li>
+<li><strong>ToS:</strong> &quot;You agree not to copy, modify, reformat, download, store, reproduce, reprocess, transmit or redistribute any data&quot; (<a href="https://www.google.com/googlefinance/disclaimer/" target="_blank" rel="noopener">disclaimer</a>, <a href="https://policies.google.com/terms" target="_blank" rel="noopener">policies.google.com/terms</a>) (אומת היום). <strong>בדיקה חיה:</strong> ✅ scrape.</li>
+</ul>
+<pre><code>curl -A &quot;$UA&quot; &#39;https://www.google.com/finance/quote/AAPL:NASDAQ&#39; → 200, 1.36MB; &lt;span&gt;$335.89&lt;/span&gt;
+</code></pre>
+<p><strong>26. CNBC quote webservice (לא רשמי)</strong></p>
+<ul>
+<li><code>restQuote.htm?symbols=AAPL&amp;output=json</code> → ❌ <strong>404</strong>. החלופה <code>quote.htm?…&amp;requestMethod=itv&amp;output=json</code> ✅: <code>last 335.97</code>, <code>last_timedate &quot;12:55 PM EDT&quot;</code>, <code>realTime &quot;true&quot;</code>, <code>source &quot;Last NASDAQ LS, VOL From CTA&quot;</code>; פחות מדקה. אין bid/ask (אומת היום).</li>
+<li><strong>CORS:</strong> ✅ <code>access-control-allow-origin: *</code> → המקור היחיד בזמן אמת שנקרא ישירות מדפדפן. <strong>ToS:</strong> 403 (לא אומת).</li>
+</ul>
+<pre><code>curl -A &quot;$UA&quot; &#39;https://quote.cnbc.com/quote-html-webservice/quote.htm?symbols=AAPL&amp;requestMethod=itv&amp;noform=1&amp;partnerId=2&amp;fund=1&amp;exthrs=1&amp;output=json&#39;
+→ {&quot;symbol&quot;:&quot;AAPL&quot;,&quot;last&quot;:&quot;335.97&quot;,&quot;last_timedate&quot;:&quot;12:55 PM EDT&quot;,&quot;realTime&quot;:&quot;true&quot;,&quot;volume&quot;:&quot;14,090,183&quot;}
+</code></pre>
+<h4 id="תל-אביב-אירופה-אסיה-ואופציות-a4">תל אביב, אירופה, אסיה ואופציות (A4)</h4>
+<p><strong>27. TASE DataHub — ה־API הרשמי של הבורסה</strong></p>
+<ul>
+<li>פורטל <a href="https://datahubapi.tase.co.il/" target="_blank" rel="noopener">datahubapi.tase.co.il</a> על Kong Konnect. <code>GET https://datahubapi.tase.co.il/api/v2/portal</code> → <code>&quot;is_public&quot;:false,&quot;oidc_auth_enabled&quot;:true</code>; <code>https://datahubapi.tase.co.il/api/v2/products</code> → 401 (אומת היום). אפילו הקטלוג סגור בלי חשבון.</li>
+<li><strong>מוצרים חינמיים:</strong> לפי <a href="https://pypi.org/project/tasepy/" target="_blank" rel="noopener">tasepy</a>: &quot;4 free API endpoints: Funds, Indices Basic, Indices Online, Securities Basic&quot;; מפתח ב־<a href="https://www.tase.co.il/en/content/products_lobby/datahub" target="_blank" rel="noopener">tase.co.il … datahub</a> (לא אומת מול TASE; הדף מפנה ל־<code>data_services</code>, SPA לא קריא).</li>
+<li>איחור, מכסות, ToS, מחיר: לא אומת. עיתונות 2020: <a href="https://israelhayom.com/2020/09/25/tel-aviv-stock-exchange-offering-streamlined-access" target="_blank" rel="noopener">israelhayom</a>, <a href="https://mondovisione.com/media-and-resources/news/tase-data-hub-the-tel-aviv-stock-exchange-is-launching-a-data-system-that-allo-2020101/" target="_blank" rel="noopener">mondovisione</a>. <strong>בדיקה חיה:</strong> 📄. <strong>המלצה:</strong> שהמשתמש ייכנס לפורטל בעצמו ויבדוק את Securities Basic.</li>
+</ul>
+<p><strong>28. אתר הבורסה — <code>api.tase.co.il</code> (לא רשמי)</strong></p>
+<ul>
+<li><strong>איחור:</strong> נבדק אחרי הסגירה: <code>&quot;LastDealTime&quot;:&quot;EoD&quot;</code>, <code>&quot;TradeDate&quot;:&quot;07/10/2026&quot;</code>. תוך־יומי לא נבדק (לא אומת).</li>
+<li><strong>היסטוריה:</strong> <code>POST /api/security/historyeod</code> → OHLC יומי + מחזור ביחידות ובשקלים (אומת היום). לפי TASE מ־2000 (<a href="https://mondovisione.com/news/tase-launches-new-website-for-the-first-time-all-trading-data-from-the-year-2000-2011124/" target="_blank" rel="noopener">mondovisione</a>) (לא אומת ב־API).</li>
+<li><strong>bid/ask:</strong> לא נמצאו. <strong>מגבלות:</strong> Incapsula; בלי <code>Referer: https://market.tase.co.il/</code> → דף חוסם. <strong>CORS:</strong> ❌ 403 עם Origin זר. <strong>ToS:</strong> לא נמצא (SPA); להניח API פנימי בלי רשות.</li>
+<li><strong>מחירים באגורות:</strong> 11990 = 119.90 ₪. <strong>בדיקה חיה:</strong> ✅ (16:53:59 UTC).</li>
+</ul>
+<pre><code>curl -s -A &#39;Mozilla/5.0 ...&#39; -H &#39;Referer: https://market.tase.co.il/&#39; &#39;https://api.tase.co.il/api/company/securitydata?securityId=629014&amp;lang=1&#39;
+{&quot;Symbol&quot;:&quot;TEVA&quot;,&quot;LastRate&quot;:11990.0,&quot;Change&quot;:-0.17,&quot;TradeDate&quot;:&quot;07/10/2026&quot;,&quot;LastDealTime&quot;:&quot;EoD&quot;,&quot;OverallTurnOverUnits&quot;:1153909,&quot;TurnOverValueShekel&quot;:137590220.00}
+curl -s -X POST -H &#39;Referer: https://market.tase.co.il/&#39; -H &#39;Content-Type: application/json&#39; https://api.tase.co.il/api/security/historyeod \
+  -d &#39;{&quot;dFrom&quot;:&quot;2021-10-07&quot;,&quot;dTo&quot;:&quot;2026-10-07&quot;,&quot;oId&quot;:&quot;00629014&quot;,&quot;pageNum&quot;:1,&quot;pType&quot;:&quot;8&quot;,&quot;TotalRec&quot;:1,&quot;lang&quot;:&quot;1&quot;}&#39;
+{&quot;Items&quot;:[{&quot;TradeDate&quot;:&quot;07/10/2026&quot;,&quot;OpenRate&quot;:11900.0,&quot;CloseRate&quot;:11990.0,&quot;HighRate&quot;:12090.0,&quot;LowRate&quot;:11820.0,...
+פועלים (securityId=662577): POALIM 7400.0 07/10/2026 EoD 4160313
+</code></pre>
+<p><strong>29. Maya (<code>https://mayaapi.tase.co.il/api/company/details?companyId=629&amp;lang=1</code>)</strong> — ❌ &quot;This page can&#39;t be displayed due to a security violation&quot; (16:53 UTC). דיווחי חברות, לא מחירים; לא רלוונטי.</p>
+<p><strong>30. Investing.com</strong> — ❌ 403 (Cloudflare) על <a href="https://www.investing.com/equities/teva-pharmaceutical-industries-ltd" target="_blank" rel="noopener">דף TEVA</a>. אין API; ToS אוסרים scraping (לא אומת). לא מומלץ.</p>
+<p><strong>31. Börse Frankfurt (<code>api.boerse-frankfurt.de</code>, לא רשמי)</strong></p>
+<ul>
+<li><code>&quot;timestampLastPrice&quot;:&quot;2026-10-07T18:39:14+02:00&quot;</code> (16:39 UTC) בשעה 16:55, <code>tradingTimeEnd 22:00</code> → כנראה מחיר פרנקפורט ולא סגירת Xetra; איחור לא אומת. <strong>אי־התאמה:</strong> Yahoo SAP.DE = 187.62 = <code>closingPricePrevTradingDay</code> כאן, בעוד <code>lastPrice</code> 188.02 (<strong>לא הוכרע</strong>).</li>
+<li>בלי מפתח, עבד גם בלי Referer. <strong>CORS:</strong> ❌ 403 עם Origin זר. ToS לא נבדק. <strong>בדיקה חיה:</strong> ✅.</li>
+</ul>
+<pre><code>curl -s &#39;https://api.boerse-frankfurt.de/v1/data/price_information/single?isin=DE0007164600&amp;mic=XETR&#39;
+{&quot;closingPricePrevTradingDay&quot;:187.62,&quot;lastPrice&quot;:188.02,&quot;mic&quot;:&quot;XETR&quot;,&quot;timestampLastPrice&quot;:&quot;2026-10-07T18:39:14+02:00&quot;,&quot;turnoverInPieces&quot;:1671276}
+</code></pre>
+<p><strong>32. Euronext live / JPX</strong> — Euronext <code>https://live.euronext.com/en/ajax/getDetailedQuote/FR0000121014-XPAR</code> מחזיר JSON מוצפן (<code>{&quot;ct&quot;:&quot;nDoEKry...&quot;}</code>); <code>api.live.euronext.com</code> לא ענה ❌. JPX לא נבדק. לא נמצא feed חינמי פתוח באירופה/אסיה מלבד Börse Frankfurt.</p>
+<p><strong>33. Cboe All Access API (בתשלום)</strong> — <a href="https://datashop.cboe.com/cboe-all-access-api" target="_blank" rel="noopener">datashop.cboe.com/cboe-all-access-api</a>: Free Trial 500 points/day ל־14 יום, &quot;Credit card authorization is required&quot; → <strong>נפסל כחינמי</strong> (אומת היום). Tier 1 ‎$599/חודש (<a href="https://datashopcert.livevol.com/all-access-apis-pricing" target="_blank" rel="noopener">pricing</a>, מתוצאת חיפוש, לא אומת). 📄.</p>
+<p><strong>34. optionsDX</strong> — <a href="https://www.optionsdx.com/shop/" target="_blank" rel="noopener">optionsdx.com/shop</a>: 10 מוצרים ב־$0.00 (SPY, SPX, VIX, BTC, QQQ, TSLA, AAPL, UVXY, SLV, NVDA Option Chains) (אומת היום). שנים, תדירות וצורך בחשבון לא פורטו. הורדת קבצים, לא API. 📄.</p>
+<p><strong>35. Tradier sandbox (אופציות)</strong> — ראו #10. <code>GET https://sandbox.tradier.com/v1/markets/options/chains?symbol=AAPL&amp;expiration=2026-10-09</code> → 401 (אומת היום).</p>
+<h2 id="חלק-ב-מה-אפשר-ללמוד-מחשבונות-דמו-קיימים">חלק ב — מה אפשר ללמוד מחשבונות דמו קיימים</h2>
+<p>הערת גישה (B1): דפים רשמיים של interactivebrokers.com / ibkr.info, paperMoney ב־schwab.com, investopedia.com/simulator ו־marketwatch.com/games חסמו גישה אוטומטית (403/401). טענות עליהם מסומנות (לא אומת). &quot;מתועד&quot; = מה שהפלטפורמה כותבת; &quot;משתמשים מדווחים&quot; = פורומים, Reddit, חנויות אפליקציות. טענות &quot;מזיכרון&quot; של העובד מסומנות <strong>(לא אומת, ללא קישור)</strong>.</p>
+<h3 id="טבלת-פלטפורמות">טבלת פלטפורמות</h3>
+<div class="tbl"><table><thead><tr><th>פלטפורמה</th><th>מקור מחירים/איחור</th><th>מודל מילוי (ספרד/החלקה/מילוי חלקי)</th><th>סטופ בפער</th><th>שורט</th><th>מינוף/סגירה כפויה</th><th>אופציות</th><th>עמלות</th><th>הבדל מהאמיתי</th></tr></thead><tbody><tr><td><strong>Interactive Brokers Paper</strong></td><td>נתונים אמיתיים לפי מנויי החשבון האמיתי; בלי שיתוף: ארה&quot;ב 15 דק&#39;, עתידים 10 דק&#39;</td><td>מילוי מ־top of book, בלי עומק; החלקה ומילוי חלקי לא מתועדים</td><td>לא מתועד; &quot;סטופים תמיד מדומים&quot;</td><td>לא נמצא (מזיכרון: כמו האמיתי, לא אומת)</td><td>$1M התחלתי; מרג&#39;ין כמו האמיתי; חיסול לא נמצא</td><td>יש; אין penny-trading; מימוש/הקצאה לא נמצאו</td><td>לא נמצא</td><td>חסרים VWAP/Auction; תלונות על מילויים טובים מהלימיט</td></tr>
+<tr><td><strong>Schwab thinkorswim paperMoney</strong></td><td>אמיתי; 15 דק&#39; עד חתימה על הסכמים</td><td>&quot;מחיר מילוי תיאורטי&quot; לפי עסקאות אמיתיות; צד־שלישי: מניה ב־last, אופציות ב־mid, גודל לא משפיע</td><td>לא נמצא; צד־שלישי: mark בפתיחה</td><td>לא נמצא רשמית</td><td>סוג מרג&#39;ין לבחירה; &quot;לא משקף את כל מאפייני המרג&#39;ין התוך־יומי&quot;</td><td>יש</td><td>&quot;paper commissions&quot; (לא אומת)</td><td>אין מחוץ לשעות, אין MOO/MOC; &quot;instant fills&quot;</td></tr>
+<tr><td><strong>TradingView Paper</strong></td><td>ציטוטי TV; חינם: ארה&quot;ב 15 דק&#39; (לא אומת)</td><td><strong>קנייה ב־Ask, מכירה ב־Bid</strong>, גרף ב־mid</td><td>לא נמצא</td><td>כל סימבול, בלי בדיקת השאלה ובלי עמלה</td><td>מינוף לפי נכס; דחייה בלי מרג&#39;ין; margin call לא מתועד</td><td>לא נמצא</td><td><strong>כבוי כברירת מחדל</strong></td><td>לימיט/סטופ &quot;מופעלים במחירים שלא הגיעו&quot;</td></tr>
+<tr><td><strong>Webull Paper</strong></td><td>לא מתועד; צד־שלישי: זמן אמת</td><td>מרקט &quot;מיד במחיר השוק&quot;, רק בשעות המסחר; &quot;אם אין מחזור, לא יתמלא&quot;</td><td>לא נמצא</td><td>לא נמצא</td><td>לא נמצא</td><td>עד Level 4</td><td>לא נמצא</td><td>נמחק אחרי 180 יום</td></tr>
+<tr><td><strong>eToro Virtual</strong></td><td>&quot;אותם תנאי שוק&quot;; איחור לא נמצא</td><td>לא נמצא</td><td>אמיתי: SL &quot;not guaranteed&quot; (לא אומת)</td><td>CFD; בדמו בלי עמלות</td><td>מינוף/SL/TP (לא אומת)</td><td>לא נמצא</td><td><strong>&quot;does not incur any fees&quot;</strong></td><td>רווח מנופח; $100K; איפוס רק דרך תמיכה (לא אומת)</td></tr>
+<tr><td><strong>Trading 212 Practice</strong></td><td>לא נמצא</td><td>לא נמצא לדמו</td><td>אמיתי: FOS $31.49→$60.01 (לא אומת)</td><td>רק CFD (לא אומת)</td><td>CFD ממונף; stop-out לא נמצא</td><td>אין (לא אומת)</td><td>לא נמצא</td><td>רק איפוס, אין הוספת כסף; ממשק מבלבל</td></tr>
+<tr><td><strong>Investopedia Simulator</strong></td><td>~15 דק&#39; (צד־שלישי)</td><td>במחיר המושהה, בלי החלקה; <strong>אין מגבלת נזילות</strong></td><td>לא נמצא</td><td>לפי יוצר המשחק; מינימום ~$5 (לא אומת)</td><td>לפי יוצר המשחק</td><td>קנייה בלבד</td><td>יוצר המשחק</td><td>לוח מובילים &quot;נפרץ&quot; דרך מניות פני</td></tr>
+<tr><td><strong>MarketWatch VSE</strong></td><td>~15–20 דק&#39; (לא אומת)</td><td>מחיר מושהה; הגבלת נפח אפשרית</td><td>לא נמצא</td><td>toggle</td><td>toggle + ריבית ניתנת להגדרה (לא אומת)</td><td>כנראה אין</td><td>לפי עסקה</td><td>האפליקציה הוסרה; מצב האתר לא אומת</td></tr>
+<tr><td><strong>NinjaTrader Sim101</strong></td><td>פיד חי או Market Replay (לא אומת)</td><td><strong>מנוע מילוי מתקדם לפי מחזור</strong>; &quot;Enforce immediate fills&quot; / &quot;Enforce partial fills&quot;; בבקטסט החלקה בטיקים</td><td>החלקה מוגבלת לטווח הנר הבא</td><td>לא רלוונטי</td><td>תבניות סיכון (לא אומת)</td><td>לא נמצא</td><td>תבניות (לא אומת)</td><td>לימיט &quot;מתמלא בקלות מדי בנגיעה&quot;</td></tr>
+<tr><td><strong>Alpaca Paper</strong></td><td>IEX בלבד, זמן אמת</td><td>מול <strong>NBBO</strong>; <strong>מילוי חלקי אקראי ב־10%</strong>; <strong>בלי בדיקת כמות מול נזילות</strong></td><td>לא מתועד; מילויים מחוץ לנר</td><td>יש; עמלת השאלה &quot;Coming Soon&quot;</td><td>מרג&#39;ין יש; PDT (לא אומת); חיסול לא מתועד</td><td>יש; מימוש אוטומטי ITM ≥$0.01</td><td><strong>אין</strong></td><td>&quot;הסביבות לא תמיד זהות&quot;</td></tr>
+<tr><td><strong>TradeStation SIM</strong></td><td>רק סימבולים עם הרשאת זמן אמת</td><td><strong>&quot;instant fills&quot;</strong></td><td>לא נמצא</td><td>לא נמצא</td><td>לא נמצא</td><td>לא נמצא</td><td>לא נמצא</td><td>&quot;SIM לא טוב להערכת P/L&quot; (לא אומת)</td></tr>
+<tr><td><strong>MetaTrader 5 Demo</strong></td><td>שרת הדמו של הברוקר</td><td>Ask/Bid; 4 מצבי ביצוע; FOK/IOC</td><td>לא מתועד (מזיכרון, לא אומת)</td><td>Sell CFD + swap (לא אומת)</td><td>נוסחת מרג&#39;ין מתועדת; stop-out לפי ברוקר</td><td>לא נמצא</td><td>לפי ברוקר</td><td>&quot;אי אפשר לצפות להרוויח&quot;</td></tr>
+<tr><td><strong>Stock Trainer / Wall Street Survivor / HowTheMarketWorks</strong></td><td>ST &quot;זמן אמת&quot;; WSS זמן אמת בארה&quot;ב, 15–20 בחו&quot;ל; HTMW &quot;לפחות 15 דק&#39;&quot;</td><td><strong>WSS: Bid/Ask בזמן אמת</strong>; HTMW &quot;קרוב ל־Ask/Bid&quot; (לא אומת)</td><td>ST: סטופ &quot;הופעל&quot; בלי שהמחיר הגיע</td><td>WSS לפי תחרות</td><td>WSS: מרג&#39;ין התחלתי + מחיר מינימלי</td><td>WSS קנייה בלבד</td><td>לפי מנהל</td><td>WSS: תקרות ריכוז; ST: באגים, התקדמות לא נשמרת</td></tr></tbody></table></div>
+<h3 id="תשובות-לפי-פלטפורמה">תשובות לפי פלטפורמה</h3>
+<p><strong>1. Interactive Brokers — Paper Trading</strong></p>
+<ol>
+<li><strong>מקור/איחור:</strong> חשבון הנייר משקף את מנויי החשבון האמיתי (אומת היום, <a href="https://ibkrguides.com/clientportal/aboutpapertradingaccounts.htm" target="_blank" rel="noopener">aboutpapertradingaccounts</a>). טבלת איחור: <a href="https://ibkb.interactivebrokers.com/article/1719" target="_blank" rel="noopener">ibkb 1719</a> (לא אומת, 403).</li>
+<li><strong>מילוי:</strong> &quot;Fills are simulated from the top of the book; no deep book access&quot; (אומת היום). מילויים &quot;may or may not be within the bounds of the live market&quot; (<a href="https://ibkb.interactivebrokers.com/article/252" target="_blank" rel="noopener">ibkb 252</a>, לא אומת). החלקה/מילוי חלקי: לא מתועדים.</li>
+<li><strong>סטופ בפער:</strong> &quot;Stops and other complex order types are always simulated in paper trading, which may result in slightly different behavior&quot; (אומת היום). כלל פער: לא נמצא.</li>
+<li><strong>שורט:</strong> לא נמצא מסמך (מזיכרון, לא אומת, ללא קישור).</li>
+<li><strong>מינוף:</strong> &quot;USD 1,000,000 of paper trading Equity with Loan Value&quot; (אומת היום). חיסול: לא נמצא.</li>
+<li><strong>אופציות:</strong> יש; penny-trading לא נתמך, קומבינציות מוגבלות (אומת היום). מימוש/הקצאה: לא נמצא.</li>
+<li><strong>עמלות:</strong> לא נמצא.</li>
+<li><strong>הבדל מהאמיתי:</strong> &quot;you may encounter some differences due to its construction as a simulator&quot;; חסרים VWAP, Auction, RFQ, Pegged to Market; איפוס &quot;up to five times your production account&#39;s value&quot; (אומת היום). משתמשים: &quot;Limit sell 2418 shares at 7.97. Sold at 8.13. Should be so easy to fix.&quot; (<a href="https://elitetrader.com/et/threads/paper-trader-seriously-flawed.386365/" target="_blank" rel="noopener">elitetrader</a>, אומת היום); &quot;for FX, it&#39;s stale quotes. For options, it&#39;s incomplete prices.&quot; (<a href="https://elitetrader.com/et/threads/paper-trader-seriously-flawed.386365/latest" target="_blank" rel="noopener">elitetrader latest</a>); &quot;whenever there are spikes in price and volatility my mkt orders don&#39;t even fill right away&quot; (<a href="https://reddit.com/r/algotrading/comments/1rrxemv/how_are_you_testing_your_systems_live/" target="_blank" rel="noopener">reddit</a>, דרך mirror).</li>
+<li><strong>מסכים:</strong> TWS/Client Portal/מובייל: רשימות מעקב, גרפים, כל הפקודות, תיק ורווח/הפסד, דוחות; איפוס כסף ב־Client Portal (אומת היום). אין לוח מובילים.</li>
+</ol>
+<p><strong>2. Schwab thinkorswim — paperMoney</strong></p>
+<ol>
+<li>15 דק&#39; עד חתימה על הסכמי pro/non-pro (<a href="https://toslc.thinkorswim.com/center/faq/Most-Common-Questions" target="_blank" rel="noopener">FAQ</a>, אומת היום). טענה ישנה על 20 דק&#39;: לא אומת.</li>
+<li>&quot;a theoretical fill price is assigned… based on the actual fill prices the underlying security traded at during the time interval&quot; (<a href="https://www.schwab.com/content/thinkorswim-papermoney-stock-trading-simulator" target="_blank" rel="noopener">schwab.com</a>, לא אומת, 403). צד־שלישי: &quot;generally filled at the LAST traded price&quot;, אופציות ב־mark, &quot;Trade size is not a factor&quot; (<a href="https://investingdaily.com/paper-trading" target="_blank" rel="noopener">investingdaily</a>, אומת היום). → אין החלקה לפי גודל, אין מילוי חלקי.</li>
+<li>צד־שלישי: &quot;As soon as the market opens, you may get filled at the spread&#39;s &#39;mark&#39;&quot; (אומת היום, אותו מקור).</li>
+<li>בלוג באמינות נמוכה: &quot;Short selling always available&quot; (<a href="https://blog.traderspost.io/article/does-schwab-have-paper-trading" target="_blank" rel="noopener">traderspost</a>, אומת היום).</li>
+<li>&quot;Account Margin Type&quot; לבחירה (<a href="https://toslc.thinkorswim.com/center/faq/Accounts" target="_blank" rel="noopener">FAQ Accounts</a>); &quot;paperMoney may not reflect all intraday margin features&quot; (אומת היום). חיסול: לא נמצא.</li>
+<li>יש (גם עתידים ופורקס). מימוש/הקצאה: לא נמצא.</li>
+<li>&quot;paper commissions&quot; (<a href="https://workplace.schwab.com/story/practice-trading-risk-free-with-papermoney" target="_blank" rel="noopener">workplace.schwab.com</a>, לא אומת).</li>
+<li>אין מחוץ לשעות, אין MOO/MOC (לא אומת). $100K, חשבון &quot;D-&quot; (אומת היום). משתמשים: &quot;I&#39;ve been getting phantom market orders with no stoploss placed on Paper Money.&quot; (<a href="https://usethinkscript.com/threads/phantom-paper-money-trades.21766/latest" target="_blank" rel="noopener">usethinkscript</a>, אומת היום); &quot;absurdly simple and unrealistic, with instant fills all the time no matter what order type&quot; (<a href="https://www.reddit.com/r/thinkorswim/comments/1leoipz/futures_paper_money_problems" target="_blank" rel="noopener">reddit</a>, לא אומת); מנוע &quot;very bad&quot;, אפשר &quot;buy routinely at the bid and sell routinely at the ask&quot; (<a href="https://futures.io/thinkorswim/38747-paper-vs-real.html" target="_blank" rel="noopener">futures.io</a>, לא אומת).</li>
+<li>ערכה כתומה = נייר (לא אומת); Monitor (Activity and Positions), Analyze, גרפים; &quot;Adjust Account&quot; / &quot;Reset All Balances and Positions&quot; (אומת היום). אין לוח מובילים.</li>
+</ol>
+<p><strong>3. TradingView — Paper Trading</strong></p>
+<ol>
+<li>ההסתייגות על איחור חלה &quot;Once you connect to a real broker (not Paper Trading)&quot; (<a href="https://www.tradingview.com/support/solutions/43000739323/" target="_blank" rel="noopener">43000739323</a>, אומת היום). חינם: 15 דק&#39; (<a href="https://coincub.com/blog/tradingview-paper-trading/" target="_blank" rel="noopener">coincub</a>, לא אומת).</li>
+<li>&quot;Orders are executed at the Ask and Bid prices… while the chart data is built at the middle price&quot; (<a href="https://www.tradingview.com/support/solutions/43000647247" target="_blank" rel="noopener">43000647247</a>, אומת היום). מתחרה: מילוי 100% בנגיעה ראשונה (<a href="https://tapeboard.com/compare/tradingview-paper-trading-alternative" target="_blank" rel="noopener">tapeboard</a>, לא אומת).</li>
+<li>לא נמצא. הסקת העובד (לא מתועד): סטופ → מרקט בציטוט הראשון.</li>
+<li>שורט לכל סימבול, סגירה ב־Ask (אומת היום). השאלה/עמלה: לא נמצאו.</li>
+<li>&quot;if the required margin… exceeds your available margin, the order will not be executed&quot;; &quot;TradingView does not provide real margin trading… We only simulate the mechanics&quot; (<a href="https://www.tradingview.com/support/solutions/43000742700-how-to-trade-with-leverage-in-paper-trading/" target="_blank" rel="noopener">43000742700</a>, אומת היום). ברירות מחדל 1:1/20:1/50:1 (לא אומת). margin call: לא נמצא.</li>
+<li>לא נמצא.</li>
+<li>&quot;The commission is inactive by default&quot; (<a href="https://www.tradingview.com/support/solutions/43000755797-what-is-commission-per-contract-in-paper-trading/" target="_blank" rel="noopener">43000755797</a>, אומת היום).</li>
+<li>משתמשים: לימיט וסטופ &quot;at prices that never actually reached those levels&quot; (<a href="https://www.reddit.com/r/TradingView/comments/1kpcvl2/paper_trading_is_buggy" target="_blank" rel="noopener">reddit</a>, לא אומת); &quot;15–25% better than live&quot; (tapeboard, לא אומת).</li>
+<li>&quot;Order ticket, Depth of market, and Chart trading&quot; (<a href="https://www.tradingview.com/support/solutions/43000516466-paper-trading-main-functionality/" target="_blank" rel="noopener">43000516466</a>, אומת היום); Account Manager; איפוס (לא אומת).</li>
+</ol>
+<p><strong>4. Webull — Paper Trading</strong> (מקור: <a href="https://www.webull.com/help/faq/11069-Paper-Trading" target="_blank" rel="noopener">FAQ 11069</a>, אומת היום)</p>
+<ol>
+<li>לא מתועד; צד־שלישי זמן אמת (<a href="https://www.benzinga.com/money/how-to-paper-trade-on-webull" target="_blank" rel="noopener">benzinga</a>, לא אומת).</li>
+<li>&quot;Market orders are only executed during regular trading hours… and fill immediately at the current market price&quot;; &quot;If there is no trading volume after you place an order, it will not be filled&quot;. Bid/Ask, החלקה, מילוי חלקי: לא נמצא. הודעה 2025 על &quot;pricing engine designed to better reflect live market conditions&quot; (לא אומת).</li>
+<li>רק &quot;when the specified price or condition is met&quot;.</li>
+<li>לא נמצא. 5. לא נמצא; Futu: <a href="https://support.futunn.com/en/topic814" target="_blank" rel="noopener">US Margin Paper Trading Rules</a> (לא אומת).</li>
+<li>&quot;all options strategies available for live trading, including Level 3 and Level 4&quot; (אומת היום).</li>
+<li>לא נמצא.</li>
+<li>&quot;all transactions and funds are not real&quot;; נמחק אחרי 180 יום (אומת היום). ציטוט מאומת: לא נמצא (<a href="https://www.reddit.com/r/Daytrading/comments/1cte14f/paper_trading_on_webull_help/" target="_blank" rel="noopener">r/Daytrading</a>, לא נקרא).</li>
+<li>כפתורים כתומים; מסחר 24 שעות שני–שישי בנבחרות (אומת היום); Reset ל־$100K (לא אומת).</li>
+</ol>
+<p><strong>5. eToro — Virtual Portfolio</strong></p>
+<ol>
+<li>&quot;replicates the same features and market conditions as a real investing account&quot;, &quot;real-time trends&quot; (<a href="https://www.etoro.com/en-us/trading/demo-account/" target="_blank" rel="noopener">demo-account</a>, אומת היום). איחור: לא נמצא.</li>
+<li>לא נמצא. 3. אמיתי: SL &quot;not guaranteed&quot;, &quot;at the next available rate&quot; (<a href="https://etoro.com/wp-content/uploads/2018/12/eToroEU_BE_Policy_v11.18.pdf" target="_blank" rel="noopener">BE Policy PDF</a>, לא אומת).</li>
+<li>CFD; הדמו &quot;does not incur any fees&quot; (אומת היום). 5. מינוף/SL/TP (לא אומת). 6. לא נמצא. 7. &quot;does not incur any fees nor affect your actual account balance&quot; (אומת היום).</li>
+<li>רווח מנופח; $100K; איפוס דרך תמיכה (לא אומת). תלונה כללית: &quot;ETORO set prices to ensure you lose your money&quot; (<a href="https://www.forexpeacearmy.com/community/goto/post?id=420076" target="_blank" rel="noopener">forexpeacearmy</a>, לא אומת).</li>
+<li>מתג Real/Virtual, CopyTrader, Smart Portfolios (אומת היום).</li>
+</ol>
+<p><strong>6. Trading 212 — Practice Mode</strong></p>
+<ol>
+<li>&quot;zero delay&quot; (<a href="https://blog.wikibit.com/?p=1103" target="_blank" rel="noopener">wikibit</a>, לא אומת). 2. אמיתי: &quot;may be executed at a different price than your target if the market opens with a gap&quot; (לא אומת).</li>
+<li>אמיתי: FOS, סטופ ב־$31.49 מולא ב־$60.01 (<a href="https://www.financial-ombudsman.org.uk/decision/DRN-5754968.pdf" target="_blank" rel="noopener">DRN-5754968</a>, לא אומת).</li>
+<li>CFD (לא אומת). 5. stop-out 50% (מזיכרון, לא אומת, ללא קישור). 6. אין (לא אומת). 7. לא נמצא.</li>
+<li>(אומתו היום) &quot;The option to &#39;Manage funds&#39; is only present when the account uses real money&quot; (<a href="https://community.trading212.com/t/add-funds-to-my-practice-account/64356" target="_blank" rel="noopener">64356</a>); &quot;it looks the same at the real money version and you could get the 2 mixed up very easily&quot; (<a href="https://community.trading212.com/t/practice-mode-suggestion/26095" target="_blank" rel="noopener">26095</a>); &quot;from mobile browser I can see &#39;Invest&#39; among products, but from desktop only CFD&quot; (<a href="https://community.trading212.com/t/trading-212-invest-practice-on-desktop/1907" target="_blank" rel="noopener">1907</a>).</li>
+<li>איפוס עד ~50K, Pies (לא אומת).</li>
+</ol>
+<p><strong>7. Investopedia Stock Simulator</strong></p>
+<ol>
+<li>&quot;stock prices aren&#39;t updated in real time but every 15 minutes&quot; (<a href="https://stockmarketgame.net/investopedia-simulator-the-ultimate-review" target="_blank" rel="noopener">stockmarketgame.net</a>, אומת היום, צד־שלישי). <a href="https://www.investopedia.com/simulator/faq" target="_blank" rel="noopener">FAQ רשמי</a> חסום.</li>
+<li>בלוג רשמי 2008: מרקט מחוץ לשעות &quot;will fill at the stock&#39;s opening price the next day&quot; (<a href="https://investopediasimulator.wordpress.com/category/bug-issuefix/" target="_blank" rel="noopener">wordpress</a>, אומת היום, ישן). &quot;no realism to the liquidity of penny stocks&quot; (לא אומת).</li>
+<li>לא נמצא. 4. יוצר המשחק; ~$5 מינימום (לא אומת). 5. יוצר המשחק. 6. &quot;writing options is not supported&quot; (צד־שלישי, אומת היום). 7. דוגמה 2007: &quot;Market: $19.99, Limit: $29.95… per Contract: $1.75&quot; (<a href="https://www.bogleheads.org/forum/viewtopic.php?t=8782" target="_blank" rel="noopener">bogleheads</a>, לא אומת).</li>
+<li>&quot;there is just no freaking way&quot; $100K→$500B בלי פרצה (<a href="https://www.trade2win.com/threads/investopedia-simulator-billionaires.192818/" target="_blank" rel="noopener">trade2win</a>, לא אומת); &quot;outdated platform, static charts ... no watchlist&quot;, &quot;mobile experience … rather poor&quot; (stockmarketgame.net, אומת היום).</li>
+<li>לוח מובילים בכניסה, משחקים עם חוקים (אומת היום, צד־שלישי).</li>
+</ol>
+<p><strong>8. MarketWatch Virtual Stock Exchange</strong></p>
+<ul>
+<li><strong>מצב 2026:</strong> <a href="https://play.google.com/store/apps/details?id=com.dowjones.marketwatch.vse" target="_blank" rel="noopener">Google Play</a> → 404 (אומת היום); AppBrain: הוסרה 27.6.2025 (לא אומת). <a href="https://screenwiseapp.com/media/marketwatch-virtual-stock-exchange-website" target="_blank" rel="noopener">Screenwise</a> מתייחס לאתר כפעיל (אומת היום). האתר חוסם (401) → <strong>לא אומת, בדיקה ידנית</strong>.</li>
+</ul>
+<ol>
+<li>~15–20 דק&#39; (לא אומת); &quot;the price they see might not be the price they get&quot; (Screenwise). 2. מושהה + הגבלת נפח (לא אומת). 3. לא נמצא. 4–5. toggles; ריבית 4%/6% (לא אומת). 6. כנראה אין. 7. לפי עסקה (לא אומת). 8. &quot;cluttered, ad-heavy, and looks like a relic of the early 2000s&quot; (Screenwise, אומת היום). 9. יצירת משחק עם הון, מרג&#39;ין, שורט, עמלות, ריבית.</li>
+</ol>
+<p><strong>9. NinjaTrader — Sim101</strong></p>
+<ol>
+<li>פיד חי או Market Replay (לא אומת).</li>
+<li><a href="https://static.ninjatrader.com/support/helpGuides/nt8/options_trading.htm" target="_blank" rel="noopener">options_trading.htm</a> (אומת היום): &quot;Enforce immediate fills&quot;: &quot;filled immediately instead of using the NinjaTrader advanced simulation fill engine&quot;; &quot;Enforce partial fills&quot;. פורום: המנוע &quot;should take the volume traded into consideration&quot; (<a href="https://forum.ninjatrader.com/forum/ninjatrader-7/platform-technical-support/56455-sim-algo-for-size" target="_blank" rel="noopener">56455</a>, לא אומת). בקטסט (<a href="https://static.ninjatrader.com/support/helpGuides/nt8/understanding_historical_fill_.htm" target="_blank" rel="noopener">understanding_historical_fill</a>, אומת היום): &quot;break each historical bar into three virtual bars&quot;; החלקה &quot;expressed in &#39;ticks&#39;… only applied to market, stop-market and Market-if-touched orders&quot;.</li>
+<li>החלקה מוגבלת לטווח הנר (אומת היום). 4. לא רלוונטי. 5–7. תבניות (לא אומת).</li>
+<li>לימיט &quot;getting filled too easily on touch&quot; (<a href="https://forum.ninjatrader.com/forum/ninjatrader-7/platform-technical-support/78324-market-replay-fill-logic-bug?p=685697" target="_blank" rel="noopener">78324</a>); &quot;it would not be possible for the bid price level to move ... without every order in the queue at the higher level getting filled first&quot; (<a href="https://forum.ninjatrader.com/forum/ninjatrader-7/strategy-development-aa/62662-ninjatrader-realistic-fills/page2" target="_blank" rel="noopener">62662</a>) (לא אומת).</li>
+<li>Control Center, SuperDOM, Chart Trader, Market Analyzer, Playback (לא אומת); רקע צבעוני (אומת היום).</li>
+</ol>
+<p><strong>10. Alpaca — Paper Trading</strong> (מקור: <a href="https://docs.alpaca.markets/docs/paper-trading" target="_blank" rel="noopener">paper-trading</a>, אומת היום)</p>
+<ol>
+<li>&quot;you are only entitled to receive and make use of IEX market data&quot;.</li>
+<li>&quot;matched against the best available current market price (NBBO)&quot;; &quot;Partial fills for a random size 10% of the time&quot;; &quot;Your order quantity is not checked against the NBBO quantities… you can … receive a fill for an order that is much larger than the actual available liquidity&quot;. לא מדומים: market impact, latency slippage, queue position, price improvement.</li>
+<li>לא מתועד. משתמש: &quot;CCRN was never below $18&quot;, מולא ב־$17.52 (<a href="https://forum.alpaca.markets/t/paper-trading-impossible-price/6602" target="_blank" rel="noopener">forum 6602</a>, אומת היום).</li>
+<li>עמלת השאלה &quot;Coming Soon&quot;; אמיתי: ETB חינם, HTB עם locate ועמלה יומית (<a href="https://docs.alpaca.markets/docs/margin-and-short-selling" target="_blank" rel="noopener">margin-and-short-selling</a>, אומת היום).</li>
+<li>אמיתי: 2x לילה, 4x תוך־יומי, margin call בבוקר, חיסול בירידה חדה (אומת היום). PDT בנייר (לא אומת).</li>
+<li><a href="https://docs.alpaca.markets/docs/options-trading" target="_blank" rel="noopener">options-trading</a> (אומת היום): מימוש אוטומטי &quot;ITM by at least $0.01&quot;; &quot;will sell-out the position within 1 hour before expiry&quot;; רשומות &quot;synced at the start of the following day&quot;.</li>
+<li>אין עמלות, אין רגולציה, אין דיבידנדים.</li>
+<li>&quot;the environments are not always the same&quot;; &quot;you are essentially competing with HFT firms&quot; (<a href="https://forum.alpaca.markets/t/slippage-paper-trading-vs-real-trading/2801" target="_blank" rel="noopener">forum 2801</a>, אומת היום); &quot;some seemingly implausible fill prices&quot; (forum 6602).</li>
+<li>API; $100K; איפוס &quot;at any time later with arbitrary amount&quot;.</li>
+</ol>
+<p><strong>11. TradeStation — Simulated Trading</strong></p>
+<ol>
+<li>&quot;Simulated trading may only be done on symbols associated with your real time data entitlements&quot; (<a href="https://help.tradestation.com/10_00/eng/TradeStationHelp/desktop/simulated_trading.htm" target="_blank" rel="noopener">simulated_trading.htm</a>, אומת היום).</li>
+<li>&quot;orders are not actually executed - only simulated executions occur with instant &#39;fills&#39;&quot; (<a href="https://api.tradestation.com/docs/fundamentals/sim-vs-live" target="_blank" rel="noopener">sim-vs-live</a>, אומת היום).
+3–7. לא נמצא; בלוג באמינות נמוכה על אופציות (<a href="https://blog.pickmytrade.io/tradestation-paper-trading-inaccurate-fill-prices/" target="_blank" rel="noopener">pickmytrade</a>).</li>
+<li>חשבון &quot;SIM&quot; (אומת היום). &quot;if you are day trading you will see discrepancies&quot; (<a href="https://nexusfi.com/showthread.php?p=910379" target="_blank" rel="noopener">nexusfi 910379</a>); &quot;If you want to evaluate P/L performance, SIM is definitely not good for that.&quot; (<a href="https://nexusfi.com/showthread.php?p=442765" target="_blank" rel="noopener">nexusfi 442765</a>) (לא אומת, 403).</li>
+<li>File &gt; Manage Simulated Accounts (<a href="https://help.tradestation.com/09_01/TradeStationHelp/desktop/manage_sim_accounts.htm" target="_blank" rel="noopener">manage_sim_accounts</a>, אומת היום).</li>
+</ol>
+<p><strong>12. MetaTrader 5 — Demo</strong></p>
+<ol>
+<li>&quot;Demo accounts ... feature all the same functionality as the live ones&quot; (<a href="https://www.metatrader5.com/en/terminal/help/startworking/acc_open" target="_blank" rel="noopener">acc_open</a>, אומת היום).</li>
+<li>Instant (requote) / Request / Market / Exchange; FOK / IOC / Return (<a href="https://www.metatrader5.com/en/terminal/help/trading/performing_deals" target="_blank" rel="noopener">performing_deals</a>, אומת היום). Tester: &quot;Trading operations are always performed by Bid and Ask prices even if the chart is built by Last prices&quot; (<a href="https://www.metatrader5.com/en/terminal/help/algotrading/tick_generation" target="_blank" rel="noopener">tick_generation</a>, אומת היום).</li>
+<li>מזיכרון (לא אומת, ללא קישור). 4. swap (לא אומת).</li>
+<li>מרג&#39;ין = &quot;Volume in lots * Contract size * Open market price&quot; × שיעור (<a href="https://www.metatrader5.com/en/terminal/help/trading_advanced/margin_forex" target="_blank" rel="noopener">margin_forex</a>, אומת היום); Pepperstone 90%/50% (לא אומת).</li>
+<li>לא נמצא. 7. לפי ברוקר. 8. &quot;one cannot expect to profit from them&quot; (אומת היום). 9. Market Watch, DOM, Toolbox, Strategy Tester (לא אומת).</li>
+</ol>
+<p><strong>13. אפליקציות &quot;מאמן מניות&quot; ואתרי חינוך</strong></p>
+<ul>
+<li><strong>Stock Trainer (A-Life)</strong> (<a href="https://play.google.com/store/apps/details?id=com.alifesoftware.stocktrainer&hl=en_US" target="_blank" rel="noopener">Play</a>, אומת היום): &quot;real-time stock data&quot;, &quot;20+ world stock markets&quot;, Stop-loss/Limit, גרפים 10+ שנים. ביקורות: &quot;I set stop loss at 23.5 while the price was at 25.1. An hour after the market closes I get a notification that my order had been executed. The price did not drop below 25 even for a second.&quot;; &quot;Buy limit also is a bit buggy.. The price reaches my limit and it just does not do anything.&quot;; &quot;The progress just doesn&#39;t seem to be saved.&quot;</li>
+<li><strong>Wall Street Survivor</strong> (<a href="https://www.wallstreetsurvivor.com/rules/" target="_blank" rel="noopener">rules</a>, אומת היום): &quot;All orders for the stocks on US exchanges are executed at the real-time bid/ask prices&quot;; בחו&quot;ל 15–20 דק&#39;; מרקט מחוץ לשעות &quot;shortly after the market opens&quot;; &quot;Exploitation of delayed pricing&quot; = פסילה; אופציות קנייה בלבד; תקרות ריכוז ומספר עסקאות.</li>
+<li><strong>HowTheMarketWorks</strong> (<a href="https://www.howthemarketworks.com/order-types/" target="_blank" rel="noopener">order-types</a>, אומת היום): &quot;Quote data is delayed at least 15 minutes&quot;. הודעה 2009 (<a href="https://www.howthemarketworks.com/?p=3522" target="_blank" rel="noopener">p=3522</a>): &quot;stock orders had to be delayed by fifteen minutes before execution in order to prevent cheating… Now that the quote delays have been removed… so have the order delays&quot;. &quot;closer to the ask/bid&quot; (לא אומת).</li>
+</ul>
+<h3 id="סימולטורים-בקוד-פתוח">סימולטורים בקוד פתוח</h3>
+<p>(B2) הקוד נקרא מהדיסק בלבד. כל ה־clone-ים זהים ל־HEAD של ענף ברירת המחדל ב־GitHub היום (<code>git ls-remote</code>), וקובצי Lean זהים בייט־לבייט ל־<code>master</code> (<code>cmp</code>), ולכן מספרי השורות נכונים ל־2026-10-07.</p>
+<div class="tbl"><table><thead><tr><th>סימולטור</th><th>a. מחיר ביצוע / החלקה / מילוי חלקי</th><th>b. Limit/Stop מול נר, וגאפ</th><th>c. שורט</th><th>d. מינוף / מרג&#39;ין</th><th>e. אופציות</th><th>f. עמלות ברירת מחדל</th></tr></thead><tbody><tr><td><strong>QuantConnect Lean</strong></td><td>Ask/Bid ± slip; ברירת מחדל <code>NullSlippageModel</code> (0); יש <code>VolumeShareSlippageModel</code> (0.1·share², תקרה 2.5%) ו־<code>MarketImpactSlippageModel</code> (Almgren 2005); אין מילוי חלקי לפי נפח במניות</td><td>Stop: גאפ לרעה → <strong>Open</strong>−slip, אחרת Stop−slip; Limit: גאפ לטובה → Open</td><td><code>IShortableProvider</code>; ברירת מחדל Null (ללא הגבלה, 0 עמלה); ספק IB מקובץ</td><td><code>SecurityMarginModel</code>; PDT 4x/2x; margin call: אזהרה 5%, חיסול כשנותר ≤0 ו־used&gt;TPV·1.1</td><td>כן: הקצאה מוקדמת (ITM ≥5%, 4 ימים לפני), מימוש אוטומטי, מרג&#39;ין אופציות</td><td>IB: $0.005/מניה, מינ&#39; $1, מקס&#39; 0.5%</td></tr>
+<tr><td><strong>zipline-reloaded</strong></td><td>Close של הבר; <code>FixedBasisPointsSlippage</code> (5bp, עד 10% מנפח); <code>VolumeShareSlippage</code> (0.1·share², 2.5%); מילוי חלקי לפי נפח: כן</td><td>טריגר רק מול <strong>Close</strong> (לא H/L); אם המחיר המושפע גרוע מה־limit, אין מילוי</td><td>אין</td><td>אין</td><td>לא</td><td><code>PerShare</code> $0.001, מינ&#39; $0</td></tr>
+<tr><td><strong>backtrader</strong></td><td>Open של הבר הבא; <code>slip_perc</code>/<code>slip_fixed</code> (0; לא על Open אלא <code>slip_open=True</code>); מילוי חלקי רק עם <code>filler</code></td><td>Stop: גאפ → <strong>Open</strong>, אחרת Stop; Limit: גאפ לטובה → Open</td><td>אין בדיקה; <code>interest</code> שנתי (0)</td><td><code>leverage</code>; <code>Order.Margin</code> בשליחה בלבד; אין חיסול</td><td>לא</td><td>0</td></tr>
+<tr><td><strong>backtesting.py</strong></td><td>Open של הבר הבא (או Close) × (1±<code>spread</code>); הספרד <strong>פעם אחת</strong>; אין החלקה/נפח</td><td>Stop לפי H/L; מילוי <code>max(open, stop)</code> → בגאפ <strong>Open</strong>; Stop+Limit באותו בר → פסימי</td><td>חופשי, בלי עמלה</td><td><code>margin</code> (1/leverage), בלי הבחנה initial/maintenance; חיסול רק בהון ≤0</td><td>לא</td><td><code>commission=0</code>; <code>(fixed, relative)</code> או פונקציה</td></tr>
+<tr><td><strong>vectorbt (OSS)</strong></td><td>Close של אותו בר × (1±<code>slippage</code>); 0; מילוי חלקי לפי מזומן בלבד</td><td>אין Limit; <code>sl_stop</code>/<code>tp_stop</code>: גאפ → <strong>Open</strong>, אחרת Stop; StopLimit בלי החלקה</td><td>אין; מוגבל במזומן</td><td>אין</td><td>לא</td><td><code>fees=0</code>, <code>fixed_fees=0</code></td></tr>
+<tr><td><strong>NautilusTrader (Rust)</strong></td><td>מול ספר L1/L2, Ask/Bid; <code>prob_slippage</code> (0) טיק אחד לרעה; בר → 4 טיקים O→H→L→C עם חלוקת נפח → מילוי חלקי</td><td>Stop בתוך הבר → trigger; גאפ (<code>fill_at_market</code>) → <strong>Open</strong>; <code>prob_fill_on_limit</code> (1.0)</td><td>אסור ב־CASH; אין locate/עמלה</td><td><code>default_leverage</code> 10x במרג&#39;ין; <code>LeveragedMarginModel</code>; <code>liquidation_enabled=false</code></td><td>כן: פקיעה, מימוש ITM, סליקה כספית/פיזית; אין הקצאה מוקדמת</td><td>חובה להגדיר (MakerTaker/Fixed/PerContract)</td></tr>
+<tr><td><strong>PyBroker</strong></td><td><code>PriceType.MIDDLE</code> של הבר <strong>הבא</strong>; החלקה כבויה; Fixed(5bp)/Volatility(0.1·ATR14)/Volume(0.1·share², 2.5%, חלקי)</td><td>Limit מול מחיר המילוי בלבד; Stop מכירה: <code>min(stop, high)</code> → בגאפ <strong>High</strong> (אופטימי!)</td><td>אין; <code>interest_rate</code> על מזומן</td><td><code>leverage=1.0</code>; <strong>אין</strong> margin call (מפורש בקוד)</td><td>לא</td><td><code>fee_mode=None</code>, 0</td></tr>
+<tr><td><strong>Lumibot</strong></td><td>Open; עם ציטוטים Ask/Bid; <code>TradingSlippage</code> רק ב־SMART_LIMIT; אין נפח</td><td>Stop: גאפ → <strong>Open</strong>, אחרת Stop; Limit: גאפ לטובה → Open</td><td>אין</td><td>&quot;margin&quot;: מזומן שלילי עם ריבית; אין margin call</td><td>כן: פקיעה יומית, EXERCISED/ASSIGNED; הקצאה מוקדמת אופציונלית</td><td>ללא; <code>TradingFee(flat, percent, per_contract)</code></td></tr></tbody></table></div>
+<p><strong>QuantConnect Lean</strong> (אומת היום)</p>
+<ul>
+<li><strong>a.</strong> <code>EquityFillModel.MarketFill</code>: Ask+slip לקנייה, Bid−slip למכירה; עם TradeBar בלבד Ask/Bid = מחיר העסקה האחרון, כלומר אין ספרד אמיתי בלי נתוני ציטוט (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fills/EquityFillModel.cs#L136-L159" target="_blank" rel="noopener">EquityFillModel.cs#L136-L159</a>). ברירות מחדל ב־<code>Security</code>: <code>ImmediateFillModel</code>, <code>InteractiveBrokersFeeModel</code>, <code>NullSlippageModel</code>, <code>SecurityMarginModel</code> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Securities/Security.cs#L354-L359" target="_blank" rel="noopener">Security.cs#L354-L359</a>).</li>
+</ul>
+<pre><code class="language-csharp">var slip = asset.SlippageModel.GetSlippageApproximation(asset, order);
+fillPrice = GetBestEffortAskPrice(asset, order.Time, ...) + slip;   // Buy
+fillPrice = GetBestEffortBidPrice(asset, order.Time, ...) - slip;   // Sell
+</code></pre>
+<p>  <code>VolumeShareSlippageModel(volumeLimit=0.025, priceImpact=0.1)</code>: <code>slippagePercent = volumeShare² · priceImpact</code>, <strong>בלי מילוי חלקי</strong> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Slippage/VolumeShareSlippageModel.cs#L37-L92" target="_blank" rel="noopener">VolumeShareSlippageModel.cs#L37-L92</a>).
+  <code>MarketImpactSlippageModel</code> (Almgren 2005): α=0.891, β=0.600, γ=0.314, η=0.142, δ=0.267; σ מתשואות יומיות, ADV של 10 ימים; רעש גאוסי × U(0,1) (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Slippage/MarketImpactSlippageModel.cs#L30-L172" target="_blank" rel="noopener">L30-L172</a>, σ/ADV: <a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Slippage/MarketImpactSlippageModel.cs#L238-L254" target="_blank" rel="noopener">L238-L254</a>). <code>latency</code> ברירת מחדל 0.075 שנ&#39; מנפח את <code>nu</code>; המחברים ממליצים &quot;to recalibrate&quot; (L40).</p>
+<pre><code class="language-csharp">var nu = (double)order.AbsoluteQuantity / _symbolData.ExecutionTime / _symbolData.AverageVolume;
+var permanentImpact = _symbolData.Sigma * _symbolData.ExecutionTime * G(nu) * liquidityAdjustment + SampleGaussian() * noise;
+var temporaryImpact = _symbolData.Sigma * H(nu) + SampleGaussian() * noise;
+var realizedImpact = temporaryImpact + permanentImpact * 0.5d;   // G(x)=γ·x^α ; H(x)=η·x^β
+var ultimateSlippage = (impact * _random.NextDouble()).SafeDecimalCast();
+</code></pre>
+<ul>
+<li><strong>b.</strong> Stop (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fills/EquityFillModel.cs#L202-L262" target="_blank" rel="noopener">EquityFillModel.cs#L202-L262</a>): <code>if (tradeBar.Low &lt;= order.StopPrice) { if (tradeBar.Open &lt;= order.StopPrice) fill = Open − slip; else fill = Stop − slip; }</code>. Limit (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fills/EquityFillModel.cs#L406-L470" target="_blank" rel="noopener">L406-L470</a>): טריגר <code>Low &lt; limit</code>; גאפ לטובה → Open; תמיד מילוי מלא (TODO ב־L437).</li>
+<li><strong>c.</strong> <code>IShortableProvider</code>: <code>ShortableQuantity</code>, <code>FeeRate</code>, <code>RebateRate</code>; <code>NullShortableProvider</code> → null ו־0% (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Data/Shortable/NullShortableProvider.cs#L38-L64" target="_blank" rel="noopener">NullShortableProvider.cs#L38-L64</a>); <code>LocalDiskShortableProvider</code> קורא מקובץ יומי (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Data/Shortable/LocalDiskShortableProvider.cs#L60-L100" target="_blank" rel="noopener">L60-L100</a>).</li>
+<li><strong>d.</strong> <code>BuyingPowerModel(leverage)</code>: initial = maintenance = 1/leverage (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Securities/BuyingPowerModel.cs#L92-L106" target="_blank" rel="noopener">BuyingPowerModel.cs#L92-L106</a>); <code>PatternDayTradingMarginModel(2.0, 4.0)</code> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Securities/PatternDayTradingMarginModel.cs#L29-L31" target="_blank" rel="noopener">L29-L31</a>); <code>DefaultMarginCallModel</code> עם <code>marginBuffer=0.10</code> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Securities/DefaultMarginCallModel.cs#L60-L116" target="_blank" rel="noopener">L60-L116</a>). מינוף ברירת מחדל 2x למניות (תיעוד, לא אומת בקוד).</li>
+</ul>
+<pre><code class="language-csharp">if (marginRemaining &lt;= totalPortfolioValue * 0.05m) issueMarginCallWarning = true;
+if (marginRemaining &lt;= 0) { if (totalMarginUsed &gt; totalPortfolioValue * (1 + _marginBuffer)) { ... GenerateMarginCallOrders(...) } }
+</code></pre>
+<ul>
+<li><strong>e.</strong> <code>DefaultOptionAssignmentModel(0.05, 4 days)</code> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Securities/Option/DefaultOptionAssignmentModel.cs#L41-L71" target="_blank" rel="noopener">L41-L71</a>); <code>DefaultExerciseModel</code> לפי <code>IsAutoExercised(underlying.Close)</code> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/OptionExercise/DefaultExerciseModel.cs#L34-L72" target="_blank" rel="noopener">L34-L72</a>); <code>OptionMarginModel</code> 10% / 20% OTM (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Securities/Option/OptionMarginModel.cs#L32-L33" target="_blank" rel="noopener">L32-L33</a>).</li>
+<li><strong>f.</strong> IB: <code>feePerShare: 0.005, minimumFee: 1, maximumFeeRate: 0.005</code> (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fees/InteractiveBrokersFeeModel.cs#L150-L173" target="_blank" rel="noopener">InteractiveBrokersFeeModel.cs#L150-L173</a>); אופציות $0.25–$0.70 לחוזה, מינ&#39; $1 (<a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fees/InteractiveBrokersFeeModel.cs#L285-L317" target="_blank" rel="noopener">L285-L317</a>).</li>
+</ul>
+<p><strong>zipline-reloaded</strong> (אומת היום, <code>main</code>)</p>
+<ul>
+<li><strong>a.</strong> <code>SimulationBlotter</code>: <code>FixedBasisPointsSlippage()</code> + <code>PerShare()</code> (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/blotter/simulation_blotter.py#L63-L77" target="_blank" rel="noopener">simulation_blotter.py#L63-L77</a>); <code>FixedBasisPointsSlippage(basis_points=5.0, volume_limit=0.1)</code> (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L615-L680" target="_blank" rel="noopener">slippage.py#L615-L680</a>); תמיד <strong>close</strong> של הבר (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L160-L169" target="_blank" rel="noopener">L160-L169</a>). <code>VolumeShareSlippage</code> (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L241-L331" target="_blank" rel="noopener">L241-L331</a>):</li>
+</ul>
+<pre><code class="language-python">#   price * (1 + price_impact * (volume_share ** 2))   ; volume_limit=0.025, price_impact=0.1
+max_volume = self.volume_limit * volume
+volume_share = min(total_volume / volume, self.volume_limit)
+simulated_impact = (volume_share**2 * math.copysign(self.price_impact, order.direction) * price)
+</code></pre>
+<p>  הזמנה של 2.5% מהנפח → השפעה 0.1·0.025² = 0.00625%, כמעט אפס. <strong>לא מציאותי למניות קטנות.</strong> יתרה → בר הבא; <code>EODCancel</code> מבטל בסוף היום (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/cancel_policy.py#L46" target="_blank" rel="noopener">cancel_policy.py#L46</a>). <code>VolatilityVolumeShare</code> (חוזים): <code>MI = eta·sigma·sqrt(psi)</code>, <code>DEFAULT_ETA=0.049</code> (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L520-L600" target="_blank" rel="noopener">L520-L600</a>, <a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/constants.py#L106" target="_blank" rel="noopener">constants.py#L106</a>).</p>
+<ul>
+<li><strong>b.</strong> טריגר מול <code>current_price</code> = close בלבד (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/order.py#L160-L215" target="_blank" rel="noopener">order.py#L160-L215</a>, <a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L184" target="_blank" rel="noopener">slippage.py#L184</a>); <code>fill_price_worse_than_limit_price</code> (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L48-L78" target="_blank" rel="noopener">L48-L78</a>).</li>
+<li><strong>c/d/e.</strong> אין. <strong>f.</strong> <code>DEFAULT_PER_SHARE_COST=0.001</code>, מינימום 0, <code>PER_DOLLAR=0.0015</code> (<a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/commission.py#L25-L29" target="_blank" rel="noopener">commission.py#L25-L29</a>).</li>
+</ul>
+<p><strong>backtrader</strong> (אומת היום, חלקו דרך סוכן משנה)</p>
+<ul>
+<li><strong>a.</strong> פרמטרים (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L224-L241" target="_blank" rel="noopener">bbroker.py#L224-L241</a>); מרקט ב־Open הבא (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L853-L870" target="_blank" rel="noopener">L853-L870</a>); החלקה נחתכת ל־H/L (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L994-L1038" target="_blank" rel="noopener">L994-L1038</a>); <code>filler</code> (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/fillers.py#L30-L111" target="_blank" rel="noopener">fillers.py#L30-L111</a>): <code>maxsize = (order.data.volume[ago] * self.p.perc) // 100</code>.</li>
+<li><strong>b.</strong> (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L921-L944" target="_blank" rel="noopener">L921-L944</a>):</li>
+</ul>
+<pre><code class="language-python">if popen &gt;= pcreated:   # price penetrated with an open gap - use open
+    p = self._slip_up(phigh, popen, doslip=self.p.slip_open)
+elif phigh &gt;= pcreated: # penetrated during the session - use trigger price
+    p = self._slip_up(phigh, pcreated)
+</code></pre>
+<p>  Limit (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L898-L919" target="_blank" rel="noopener">L898-L919</a>).</p>
+<ul>
+<li><strong>c.</strong> <code>interest</code> (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/comminfo.py#L122-L130" target="_blank" rel="noopener">comminfo.py#L122-L130</a>, חישוב <a href="https://github.com/mementum/backtrader/blob/master/backtrader/comminfo.py#L274-L305" target="_blank" rel="noopener">L274-L305</a>, ניכוי <a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L1184-L1193" target="_blank" rel="noopener">bbroker.py#L1184-L1193</a>). <strong>d.</strong> <code>getsize</code> (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/comminfo.py#L192-L197" target="_blank" rel="noopener">comminfo.py#L192-L197</a>); <code>Order.Margin</code> (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L558-L583" target="_blank" rel="noopener">bbroker.py#L558-L583</a>). <strong>f.</strong> (<a href="https://github.com/mementum/backtrader/blob/master/backtrader/comminfo.py#L229-L237" target="_blank" rel="noopener">comminfo.py#L229-L237</a>).</li>
+</ul>
+<p><strong>backtesting.py</strong> (אומת היום)</p>
+<ul>
+<li><strong>a.</strong> <code>Backtest(..., spread=.0, commission=.0, margin=1., trade_on_close=False, ...)</code> (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L1197-L1207" target="_blank" rel="noopener">L1197-L1207</a>); ספרד (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L838-L843" target="_blank" rel="noopener">L838-L843</a>): <code>return (price or self.last_price) * (1 + copysign(self._spread, size))</code>. לפי התיעוד (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L1139-L1157" target="_blank" rel="noopener">L1139-L1157</a>) <code>spread</code> מוחל פעם אחת → להזין את <strong>כל</strong> הספרד. חריגה ממרג&#39;ין → ביטול (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L1006-L1012" target="_blank" rel="noopener">L1006-L1012</a>).</li>
+<li><strong>b.</strong> (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L888-L921" target="_blank" rel="noopener">L888-L921</a>):</li>
+</ul>
+<pre><code class="language-python">is_stop_hit = ((high &gt;= stop_price) if order.is_long else (low &lt;= stop_price))
+price = prev_close if self._trade_on_close and not order.is_contingent else open
+if stop_price: price = max(price, stop_price) if order.is_long else min(price, stop_price)
+</code></pre>
+<ul>
+<li><strong>d.</strong> <code>self._leverage = 1 / margin</code> (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L748" target="_blank" rel="noopener">L748</a>); חיסול בהון ≤0 (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L866-L873" target="_blank" rel="noopener">L866-L873</a>). <strong>f.</strong> (<a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L733-L760" target="_blank" rel="noopener">L733-L760</a>).</li>
+</ul>
+<p><strong>vectorbt (OSS)</strong> (אומת היום)</p>
+<ul>
+<li><strong>a.</strong> ברירות מחדל (<a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/_settings.py#L383-L416" target="_blank" rel="noopener">_settings.py#L383-L416</a>); <code>adj_price = price * (1 + slippage)</code> (<a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/portfolio/nb.py#L90" target="_blank" rel="noopener">nb.py#L90</a>), עמלות (<a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/portfolio/nb.py#L148-L150" target="_blank" rel="noopener">L148-L150</a>).</li>
+<li><strong>b.</strong> SL/TP (<a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/portfolio/nb.py#L1861-L1889" target="_blank" rel="noopener">nb.py#L1861-L1889</a>): <code>if open &lt;= stop_price: return open; if low &lt;= stop_price &lt;= high: return stop_price</code>; StopLimit בלי החלקה (<a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/portfolio/nb.py#L1616-L1630" target="_blank" rel="noopener">L1616-L1630</a>). <strong>c.</strong> שורט לפי מזומן (<a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/portfolio/nb.py#L239-L257" target="_blank" rel="noopener">L239-L257</a>).</li>
+</ul>
+<p><strong>NautilusTrader</strong> (אומת היום, <code>develop</code>, מנוע Rust; ME = <code>crates/execution/src/matching_engine/mod.rs</code>)</p>
+<ul>
+<li><strong>a.</strong> <code>book.simulate_fills</code> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L4641-L4656" target="_blank" rel="noopener">ME#L4641-L4656</a>); <code>DefaultFillModel::default()</code> = <code>(1.0, 0.0, None)</code> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/models/fill.rs#L316-L320" target="_blank" rel="noopener">fill.rs#L316-L320</a>); החלקה טיק אחד ב־L1 (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L5275-L5279" target="_blank" rel="noopener">ME#L5275-L5279</a>); מודלים נוספים (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/models/fill.rs#L361-L1401" target="_blank" rel="noopener">fill.rs#L361-L1401</a>); <code>BarTickSizes::from_volume</code> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L7668-L7730" target="_blank" rel="noopener">ME#L7668-L7730</a>).</li>
+<li><strong>b.</strong> O→H→L→C (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L1966-L2037" target="_blank" rel="noopener">ME#L1966-L2037</a>); גאפ (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L1987-L1990" target="_blank" rel="noopener">ME#L1987-L1990</a>, <a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L4658-L4670" target="_blank" rel="noopener">L4658-L4670</a>); <code>prob_fill_on_limit</code> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L4945-L4970" target="_blank" rel="noopener">ME#L4945-L4970</a>).</li>
+</ul>
+<pre><code class="language-rust">} else if self.core.last.is_some_and(|last| bar.open != last) {
+    // Gap between previous close and this bar&#39;s open
+    self.fill_at_market = true;
+</code></pre>
+<ul>
+<li><strong>c.</strong> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/mod.rs#L3253-L3291" target="_blank" rel="noopener">ME#L3253-L3291</a>). <strong>d.</strong> 10x (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/backtest/src/config.rs#L281-L285" target="_blank" rel="noopener">config.rs#L281-L285</a>); חיסול (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/backtest/src/config.rs#L359-L367" target="_blank" rel="noopener">config.rs#L359-L367</a>, <a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/backtest/src/exchange.rs#L1793-L1830" target="_blank" rel="noopener">exchange.rs#L1793-L1830</a>). <strong>e.</strong> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/execution/src/matching_engine/settlement.rs#L40" target="_blank" rel="noopener">settlement.rs#L40</a>). <strong>f.</strong> (<a href="https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/backtest/src/config.rs#L294-L299" target="_blank" rel="noopener">config.rs#L294-L299</a>).</li>
+</ul>
+<p><strong>PyBroker</strong> (אומת היום, 2.0.1)</p>
+<ul>
+<li><strong>a.</strong> <code>PriceType.MIDDLE</code> (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/context.py#L1645-L1654" target="_blank" rel="noopener">context.py#L1645-L1654</a>); <code>VolumeSlippageModel</code> (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/slippage.py#L315-L440" target="_blank" rel="noopener">slippage.py#L315-L440</a>): <code>impact = self._price_impact * ratio * ratio</code>; Fixed/Volatility (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/slippage.py#L171-L312" target="_blank" rel="noopener">L171-L312</a>).</li>
+<li><strong>b.</strong> Limit (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/portfolio.py#L1019-L1020" target="_blank" rel="noopener">portfolio.py#L1019-L1020</a>); Stop (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/portfolio.py#L2075-L2078" target="_blank" rel="noopener">L2075-L2078</a>): <code>if low &lt;= stop_value: return min(stop_value, high)</code> → בגאפ <strong>High</strong>, אופטימי, לא להעתיק.</li>
+<li><strong>c/d.</strong> &quot;an adverse mark cannot be enforced without a margin call, which is not modeled&quot; (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/portfolio.py#L894-L905" target="_blank" rel="noopener">L894-L905</a>). <strong>f.</strong> (<a href="https://github.com/edtechre/pybroker/blob/master/src/pybroker/config.py#L98-L101" target="_blank" rel="noopener">config.py#L98-L101</a>).</li>
+</ul>
+<p><strong>Lumibot</strong> (אומת היום, <code>dev</code>; BB = <code>lumibot/backtesting/backtesting_broker.py</code>)</p>
+<ul>
+<li><strong>a.</strong> <code>price = open</code> (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L3074-L3075" target="_blank" rel="noopener">BB#L3074-L3075</a>); Ask/Bid עם ציטוטים (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L4243-L4245" target="_blank" rel="noopener">BB#L4243-L4245</a>).</li>
+<li><strong>b.</strong> (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L4972-L4995" target="_blank" rel="noopener">BB#L4972-L4995</a>): <code>if side == &quot;sell&quot; and stop_val &gt;= open_val: return open_val; if low_val &lt;= stop_val &lt;= high_val: return stop_val</code>; Limit (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L4932-L4970" target="_blank" rel="noopener">BB#L4932-L4970</a>).</li>
+<li><strong>d.</strong> <code>TYPICAL_FUTURES_MARGINS</code> (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L34-L130" target="_blank" rel="noopener">BB#L34-L130</a>). <strong>e.</strong> <code>settle_expired_option_contract</code> (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L1704-L1784" target="_blank" rel="noopener">BB#L1704-L1784</a>); הקצאה מוקדמת (<a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/backtesting/backtesting_broker.py#L202-L215" target="_blank" rel="noopener">BB#L202-L215</a>). <strong>f.</strong> <a href="https://github.com/Lumiwealth/lumibot/blob/dev/lumibot/entities/trading_fee.py" target="_blank" rel="noopener">trading_fee.py</a>.</li>
+</ul>
+<h3 id="נוסחאות-להערכת-ספרד-והחלקה-מנתונים-יומיים">נוסחאות להערכת ספרד והחלקה מנתונים יומיים</h3>
+<p>סימונים: O,H,L,C מחירי פתיחה/גבוה/נמוך/סגירה; o,h,l,c הלוגריתמים; V נפח יומי; ADV נפח ממוצע; σ סטיית תקן של תשואה יומית; S ספרד יחסי. כל המאמרים אומתו היום מול Crossref דרך DOI.</p>
+<p><strong>1. Roll (1984)</strong> — קו־וריאנס סדרתית. קלט: סגירות בלבד. חלון 21–252 ימים. מגבלה: קו־וריאנס חיובית → לא מוגדר (במניות קטנות קורה הרבה; &quot;כשליש עד חצי מהחלונות&quot; לא אומת). מקור: <a href="https://doi.org/10.1111/j.1540-6261.1984.tb03897.x" target="_blank" rel="noopener">doi:10.1111/j.1540-6261.1984.tb03897.x</a>. קוד: <a href="https://github.com/eguidotti/bidask/blob/main/r/R/roll.R#L5-L23" target="_blank" rel="noopener">bidask/r/R/roll.R#L5-L23</a>.</p>
+<pre><code>S = 2 · sqrt( −Cov(Δc_t, Δc_{t−1}) )          # אם Cov &gt; 0: לאפס או signed root
+R: s2 &lt;- -4 * n/(n - 1) * (m[,3] - m[,1]*m[,2])
+</code></pre>
+<p><strong>2. Corwin &amp; Schultz (2012)</strong> — גבוה–נמוך. קלט: H,L,C. חלון: ממוצע ~21 יום של אומדנים דו־יומיים. מגבלה: מוטה מעלה בתנודתיות גבוהה ובמסחר דליל; הרבה ערכים שליליים (לאפס, &quot;CS2&quot;). מקור: <a href="https://doi.org/10.1111/j.1540-6261.2012.01729.x" target="_blank" rel="noopener">doi:10.1111/j.1540-6261.2012.01729.x</a>. קוד: <a href="https://github.com/eguidotti/bidask/blob/main/r/R/cs.R#L12-L45" target="_blank" rel="noopener">bidask/r/R/cs.R#L12-L45</a>.</p>
+<pre><code>β = (h_t−l_t)² + (h_{t−1}−l_{t−1})²
+γ = (max(H_t,H_{t−1}) − min(L_t,L_{t−1}))²   (בלוג)
+α = (√(2β) − √β)/(3−2√2) − √(γ/(3−2√2))
+S = 2(e^α − 1)/(1 + e^α)
+R: gap &lt;- pmax(0, c1 - h) + pmin(0, c1 - l)     # תיקון overnight
+   b &lt;- (h - l)^2 + (h1 - l1)^2 ; g &lt;- (pmax(ah, h1) - pmin(al, l1))^2
+   a &lt;- (sqrt(2*b) - sqrt(b)) / (3 - 2*sqrt(2)) - sqrt(g / (3 - 2*sqrt(2)))
+   s &lt;- 2*(exp(a) - 1) / (1 + exp(a))
+</code></pre>
+<p><strong>3. Abdi &amp; Ranaldo (2017)</strong> — סגירה–גבוה–נמוך. קלט: H,L,C. חלון ~21 יום. פחות רגיש לתנודתיות מ־CS. מקור: <a href="https://doi.org/10.1093/rfs/hhx084" target="_blank" rel="noopener">doi:10.1093/rfs/hhx084</a>. קוד: <a href="https://github.com/eguidotti/bidask/blob/main/r/R/ar.R#L12-L39" target="_blank" rel="noopener">bidask/r/R/ar.R#L12-L39</a>.</p>
+<pre><code>η_t = (h_t + l_t)/2
+S² = 4 · E[(c_t − η_t)(c_t − η_{t+1})] ;  S = sqrt(max(0, S²))     # &quot;AR2&quot;: שורש לכל יומיים ואז ממוצע
+R: s2 &lt;- 4 * (c1 - m1) * (c1 - m2)
+</code></pre>
+<p><strong>4. Ardia, Guidotti &amp; Kroencke (2024): EDGE</strong> — משלב אומדני מומנטים מ־O,H,L,C עם משקלות לפי שונות ותיקון להסתברות שאין מסחר. קלט: OHLC, מינימום 3 תצפיות; חלון מומלץ 21 ימים כל עוד ≥2 עסקאות לתקופה; למניות שנסחרות פחות מפעם ביום → נרות שבועיים (README). מקור: <a href="https://doi.org/10.1016/j.jfineco.2024.103916" target="_blank" rel="noopener">doi:10.1016/j.jfineco.2024.103916</a> (SSRN 3892335 החזיר 403, לא אומת). קוד: <a href="https://github.com/eguidotti/bidask/blob/main/python/bidask/edge.py#L40-L107" target="_blank" rel="noopener">bidask/python/bidask/edge.py#L40-L107</a> (<code>pip install bidask</code>, MIT, כולל <code>edge_rolling</code>; ב־R: <code>spread(x, method=c(&quot;EDGE&quot;,&quot;AR&quot;,&quot;CS&quot;,&quot;ROLL&quot;))</code>). נתונים מוכנים לכל CRSP: <a href="https://doi.org/10.7910/DVN/YAY4H6" target="_blank" rel="noopener">doi:10.7910/DVN/YAY4H6</a>.</p>
+<pre><code>m = (h+l)/2
+r1 = m_t−o_t ; r2 = o_t−m_{t−1} ; r3 = m_t−c_{t−1} ; r4 = c_{t−1}−m_{t−1} ; r5 = o_t−c_{t−1}
+x1 = −4/p_o·d1·r2 − 4/p_c·d3·r4 ;  x2 = −4/p_o·d1·r5 − 4/p_c·d5·r4
+S² = (v2·E[x1] + v1·E[x2])/(v1+v2) ;  S = sqrt(|S²|)
+python: s2 = (v2*e1 + v1*e2) / vt if vt &gt; 0 else (e1 + e2) / 2.
+</code></pre>
+<p><strong>5. Amihud (2002) ו־Kyle&#39;s λ (1985)</strong> — Amihud: תשואה מוחלטת חלקי מחזור בדולרים; proxy <strong>לינארי</strong> להשפעה, מגזים בהזמנות גדולות; עדיף לדירוג נזילות או לכיול Y. מקור: <a href="https://doi.org/10.1016/S1386-4181(01)00024-6" target="_blank" rel="noopener">doi:10.1016/S1386-4181(01)00024-6</a>. Kyle: ΔP = λ·(זרימת הזמנות נטו), λ = σ_v/(2σ_u); אמפירית דורש נתונים תוך־יומיים. מקור: <a href="https://doi.org/10.2307/1913210" target="_blank" rel="noopener">doi:10.2307/1913210</a>. קוד ייעודי: לא נמצא (שורת pandas, לא אומת).</p>
+<pre><code>ILLIQ = (1/D) · Σ_d |r_d| / (P_d · V_d)      (×10⁶ מקובל)
+ΔP/P ≈ ILLIQ · (Q · P)
+</code></pre>
+<p><strong>6. חוק השורש הריבועי ו־Almgren–Chriss</strong></p>
+<ul>
+<li>חוק השורש: Y בסדר גודל 1 (0.5–1 בספרות, <strong>לא אומת במדויק</strong>). דוגמה: 10% מהנפח, σ=4%, Y=0.7 → 0.7·4%·0.316 ≈ 0.9%. מקורות: Tóth et al. 2011 <a href="https://doi.org/10.1103/PhysRevX.1.021006" target="_blank" rel="noopener">doi:10.1103/PhysRevX.1.021006</a> / <a href="https://arxiv.org/abs/1105.1694" target="_blank" rel="noopener">arXiv:1105.1694</a>; Gatheral 2010 <a href="https://doi.org/10.1080/14697680903373692" target="_blank" rel="noopener">doi:10.1080/14697680903373692</a>.</li>
+<li>Almgren, Thum, Hauptmann &amp; Li (2005), <em>Direct Estimation of Equity Market Impact</em> (<a href="https://www.cis.upenn.edu/~mkearns/finread/costestim.pdf" target="_blank" rel="noopener">PDF, upenn</a>; הקישור ב־Lean ל־ram-ai.com → 404). γ=0.314, η=0.142, α=0.891, β=0.600, δ=0.267. <strong>המאמר דוחה שורש ריבועי לטובת חזקה 3/5, ומבוסס על large-cap בלבד</strong> → לכייל מחדש למניות קטנות.</li>
+<li>Almgren &amp; Chriss (2000/2001) <a href="https://doi.org/10.21314/JOR.2001.041" target="_blank" rel="noopener">doi:10.21314/JOR.2001.041</a>: השפעה קבועה g(v)=γ·v, זמנית h(v)=ε·sgn(v)+η·v, ε = חצי ספרד + עמלה (הצורה הלינארית מזיכרון, לא אומת מול הטקסט).</li>
+</ul>
+<pre><code>I(Q) ≈ Y · σ_daily · sqrt(Q / V_daily)                       # חוק השורש
+Almgren 2005:  I = γ·σ·(X/V)·(Θ/V)^{1/4}   (קבוע)
+               J = I/2 + sgn(X)·η·σ·|X/(V·T)|^{3/5}   (זמני; J = העלות המשולמת)
+</code></pre>
+<p><strong>7. הכללים המעשיים בסימולטורים</strong></p>
+<div class="tbl"><table><thead><tr><th>מודל</th><th>נוסחה</th><th>ברירות מחדל</th><th>קישור</th></tr></thead><tbody><tr><td>zipline <code>VolumeShareSlippage</code></td><td>P·(1 ± 0.1·min(q/V_bar, 0.025)²); כמות לבר ≤ 0.025·V_bar</td><td>0.1, 0.025</td><td><a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L241-L331" target="_blank" rel="noopener">slippage.py#L241-L331</a></td></tr>
+<tr><td>zipline <code>FixedBasisPointsSlippage</code></td><td>P·(1 ± 0.0005); כמות ≤ 0.1·V_bar</td><td>5bp, 10%</td><td><a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L615-L680" target="_blank" rel="noopener">L615-L680</a></td></tr>
+<tr><td>zipline <code>VolatilityVolumeShare</code></td><td>P·(1 ± η·σ_ann·√(q/ADV20)/10⁴)</td><td>η=0.049</td><td><a href="https://github.com/stefan-jansen/zipline-reloaded/blob/main/src/zipline/finance/slippage.py#L520-L600" target="_blank" rel="noopener">L520-L600</a></td></tr>
+<tr><td>Lean <code>VolumeShareSlippageModel</code></td><td>slip$ = 0.1·min(q/V_bar, 0.025)²·P, בלי מילוי חלקי</td><td>0.025, 0.1</td><td><a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Slippage/VolumeShareSlippageModel.cs#L37-L92" target="_blank" rel="noopener">L37-L92</a></td></tr>
+<tr><td>Lean <code>MarketImpactSlippageModel</code></td><td>Almgren 2005: temp + perm/2 + רעש, × U(0,1)</td><td>α .891 β .6 γ .314 η .142 δ .267</td><td><a href="https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Slippage/MarketImpactSlippageModel.cs#L30-L172" target="_blank" rel="noopener">L30-L172</a></td></tr>
+<tr><td>backtesting.py <code>spread</code></td><td>P·(1 ± spread), פעם אחת</td><td>0</td><td><a href="https://github.com/kernc/backtesting.py/blob/master/backtesting/backtesting.py#L838-L843" target="_blank" rel="noopener">L838-L843</a></td></tr>
+<tr><td>backtrader <code>slip_perc</code></td><td>P·(1 ± slip_perc), נחתך ל־H/L</td><td>0</td><td><a href="https://github.com/mementum/backtrader/blob/master/backtrader/brokers/bbroker.py#L994-L1038" target="_blank" rel="noopener">bbroker.py#L994-L1038</a></td></tr>
+<tr><td>vectorbt <code>slippage</code></td><td>P·(1 ± slippage)</td><td>0</td><td><a href="https://github.com/polakowo/vectorbt/blob/master/vectorbt/portfolio/nb.py#L90" target="_blank" rel="noopener">nb.py#L90</a></td></tr></tbody></table></div>
+<p><strong>8. המתכון המעשי (מניה קטנה, נתונים יומיים בלבד)</strong></p>
+<pre><code>1. Spread:  S = EDGE(O,H,L,C) על חלון 21 ימים (bidask.edge_rolling, sign=True, שלילי→0).
+   גיבוי/בקרה: Abdi–Ranaldo (AR2). רצפה: S ≥ max(S_EDGE, 2·tick/P)  (למשל $0.01×2/P).
+   אם V נמוך מאוד (&lt; ~2 עסקאות/יום) → להעריך על נרות שבועיים.
+2. σ = סטיית התקן של log(C_t/C_{t−1}) על 20 ימים; ADV = ממוצע V על 20 ימים.
+3. עלות כוללת (חד־כיווני):  cost% = S/2 + Y·σ·sqrt(Q/ADV),  Y≈0.7 (טווח 0.5–1; חוק השורש, Tóth 2011/Almgren 2005).
+4. מחיר מילוי: קנייה = Open_next·(1+cost%), מכירה = Open_next·(1−cost%); לחסום בתוך [Low, High] של הבר.
+5. מגבלת השתתפות: למלא לכל היותר 10% מ־V של הבר (zipline FixedBP=10%; שמרני: 2.5%); היתרה → בר הבא או ביטול בסוף היום.
+6. Stop (מכירה): אם Open ≤ Stop → מילוי ב־Open·(1−cost%); אחרת אם Low ≤ Stop → Stop·(1−cost%). (Lean/backtrader/backtesting.py)
+7. Limit (קנייה): ממולא רק אם Low &lt; Limit (קפדני: Low ≤ Limit−S/2·P); מחיר = min(Open, Limit); גם כאן ≤10% נפח.
+8. בקרת שפיות: Amihud ILLIQ גבוה (top decile) → להעלות Y או להוריד את מגבלת ההשתתפות.
+</code></pre>
+<h3 id="מסכים-וכלים-שחוזרים-אצל-כולם">מסכים וכלים שחוזרים אצל כולם</h3>
+<ol>
+<li><strong>רשימת מעקב</strong> אצל כמעט כולם (חריג: Investopedia, שמבקרים מציינים לרעה).</li>
+<li><strong>טיקט פקודה:</strong> Market/Limit/Stop/Stop-Limit עם Day/GTC; ברוקרים גם OCO/Bracket/Trailing; כל פלטפורמה מפרסמת פקודות שלא נתמכות בדמו (IBKR: VWAP/Auction; TOS: MOO/MOC).</li>
+<li><strong>פוזיציות + רווח/הפסד</strong> ממומש ולא ממומש, מזומן וכוח קנייה; עם מינוף גם מצב מרג&#39;ין (TradingView Account Manager, TOS Monitor).</li>
+<li><strong>היסטוריית פקודות וביצועים</strong> נפרדת לפתוחות, שבוצעו ובוטלו.</li>
+<li><strong>מסחר מתוך הגרף</strong> (TradingView, NinjaTrader), DOM/SuperDOM במתקדמות.</li>
+<li><strong>איפוס יתרה / הון התחלתי:</strong> IBKR $1M (ועד פי 5 מהאמיתי); TOS, Webull, Alpaca, eToro $100K; Trading 212 איפוס בלבד; eToro רק דרך תמיכה.</li>
+<li><strong>סימון ויזואלי של דמו:</strong> TOS כתום/כחול, כפתורים כתומים ב־Webull, רקע צבעוני ב־NinjaTrader, חשבונות &quot;D-&quot;/&quot;SIM&quot;.</li>
+<li><strong>לוח מובילים ומשחקים עם חוקים</strong> רק בחינוכיות (Investopedia, MarketWatch, WSS, HTMW): יוצר המשחק קובע עמלה, מרג&#39;ין, שורט, אופציות, ריבית, תקרות.</li>
+<li><strong>הגדרות ריאליזם למשתמש:</strong> עמלה (TradingView), מינוף לפי נכס (TradingView), מתגי מילוי מיידי/חלקי (NinjaTrader), סוג מרג&#39;ין (TOS).</li>
+</ol>
+<h3 id="מה-כדאי-להעתיק">מה כדאי להעתיק</h3>
+<ol>
+<li><strong>קנייה ב־Ask ומכירה ב־Bid, גרף ב־mid/last</strong> (TradingView, Wall Street Survivor, MT5). במניות קטנות עם ספרד רחב זה עיקר העלות; כשאין ציטוטים, להעריך את הספרד ב־EDGE (חבילת <code>bidask</code>, MIT).</li>
+<li><strong>מילוי לפי נזילות עם יתרה לבר הבא:</strong> Alpaca מודה שהדמו שלה נותן מילוי &quot;much larger than the actual available liquidity&quot;; לתקן עם מגבלת השתתפות (<code>volume_limit</code> של zipline, <code>FixedBarPerc</code> של backtrader) ומנוע לפי מחזור בסגנון NinjaTrader.</li>
+<li><strong>מילוי חלקי לפי מחזור אמיתי</strong>, לא אקראי (Alpaca 10%).</li>
+<li><strong>מבנה עלות &quot;חצי ספרד + השפעה&quot;</strong> (ε ו־η של Almgren–Chriss), עם השפעה בחוק השורש σ·√(Q/ADV), ולא 0.1·share² של zipline/Lean שנותן כמעט אפס.</li>
+<li><strong>כלל הגאפ של Lean/backtrader/backtesting.py:</strong> סטופ שנפרץ בגאפ מתמלא ב־<strong>Open</strong> (או גרוע ממנו), לא במחיר הסטופ; Limit בגאפ לטובה ב־Open. זה מה שקורה בחשבונות אמיתיים (eToro, Trading 212, FOS $31.49→$60.01), ואף דמו לא מתעד זאת, לכן להציג למשתמש במפורש.</li>
+<li><strong>החלקה מוגדרת ומוגבלת לטווח האמיתי</strong> (NinjaTrader: בטיקים, רק על Market/Stop/MIT, בתוך הנר הבא), כדי שלא ייווצרו מחירים &quot;בלתי אפשריים&quot;.</li>
+<li><strong>עמלות וריביות פעילות כברירת מחדל:</strong> עמלת IB של Lean ($0.005/מניה, מינ&#39; $1, מקס&#39; 0.5%); ריבית מרג&#39;ין (MarketWatch, backtrader <code>interest</code>); עמלת השאלה בסגנון <code>IShortableProvider</code> של Lean ו־Alpaca האמיתי (ETB חינם, HTB עמלה יומית ולפעמים לא זמין; טווח 3–30% לשנה לא אומת).</li>
+<li><strong>מרג&#39;ין אמיתי:</strong> דחיית פקודה בלי מרג&#39;ין (TradingView); אזהרה ב־5% וחיסול כשנותר ≤0 (Lean) במקום &quot;חיסול רק באפס הון&quot; (backtesting.py); מחיר מינימלי למניה ממונפת (WSS).</li>
+<li><strong>ההנחה הפסימית של backtesting.py:</strong> Stop ו־Limit באותו נר → התרחיש הגרוע.</li>
+<li><strong>סימון חד של מצב סימולציה, איפוס פשוט, ויומן ביצועים</strong> שמראה לכל עסקה את המחיר שנראה במסך מול מחיר הביצוע. העמודה הזו לא קיימת באף פלטפורמה.</li>
+</ol>
+<h3 id="טעויות-שכדאי-להימנע-מהן">טעויות שכדאי להימנע מהן</h3>
+<ol>
+<li><strong>מילוי מיידי במחיר המסך</strong> (TradeStation &quot;instant fills&quot;, TOS &quot;instant fills all the time&quot;). הסיבה המרכזית ש&quot;הדמו טוב מהמציאות&quot;.</li>
+<li><strong>לימיט שמתמלא בנגיעה ראשונה בלי תור</strong> (NinjaTrader &quot;filled too easily on touch&quot;; TradingView &quot;15–25% better than live&quot; לפי מתחרה). לימיט צריך להתמלא רק כשהמחיר <strong>עובר</strong> את הרמה או שהיה מספיק מחזור בה.</li>
+<li><strong>בלי מגבלת נזילות:</strong> &quot;המיליארדרים&quot; של Investopedia ($100K→$500B במניות פני); Alpaca בלי בדיקת כמות. הורס גם לוח מובילים.</li>
+<li><strong>מחירים שלא היו בשוק:</strong> IBKR לימיט 7.97 מולא ב־8.13; Alpaca $17.52 כשהמחיר לא ירד מ־$18; Stock Trainer סטופ בלי שהמחיר הגיע. לבדוק שכל מילוי בתוך [Low, High] של פרק הזמן.</li>
+<li><strong>ביצוע ב־Close של אותו נר שבו נוצר האות</strong> (ברירת המחדל של vectorbt ו־zipline): הטיית מבט־קדימה; במניה קטנה Close של היום שונה מאוד מ־Open של מחר.</li>
+<li><strong>כלל סטופ אופטימי:</strong> בדיקה רק מול Close (zipline) או מילוי בגאפ ב־<code>min(stop, high)</code> (PyBroker). למלא ב־Open.</li>
+<li><strong>דמו בלי עמלות, ריביות ועמלות השאלה</strong> (eToro &quot;does not incur any fees&quot;, Alpaca בלי עמלות ודיבידנדים, TradingView עמלה כבויה) → רווח מנופח. ובלי הגבלת שורט (backtesting.py, vectorbt): במניות קטנות השאלה לא זמינה או יקרה.</li>
+<li><strong>פער מידע במחירים מושהים בלי הגנה:</strong> Investopedia ו־HTMW נאלצו להוסיף השהיית ביצוע וחוקים נגד &quot;Exploitation of delayed pricing&quot;. עם נתונים מושהים, הביצוע חייב להיות לפי מחיר מאוחר מרגע השליחה.</li>
+<li><strong>אומדני ספרד בלי טיפול:</strong> Roll/CS על יום אחד או בלי איפוס שליליים; להשתמש ב־EDGE או ב־CS2/AR2 על 21 ימים. ולהחיל חצי ספרד בכל כיוון (ב־backtesting.py <code>spread</code> מוחל פעם אחת → להזין ספרד מלא). ולא להעתיק את מקדמי Almgren 2005 כמו שהם למניות קטנות (large-cap בלבד; ב־Lean גם latency 75ms ואקראיות U(0,1)).</li>
+<li><strong>ממשק שמבלבל בין דמו לאמיתי, ואובדן נתונים</strong> (Trading 212 &quot;you could get the 2 mixed up&quot;, Webull מוחק אחרי 180 יום, Stock Trainer &quot;progress … not saved&quot;), והתנהגות לא מתועדת (אף פלטפורמה לא מתעדת סטופ בפער, החלקה או חיסול בדמו). לשמור עמיד ולפרסם עמוד &quot;איך מחושב המילוי&quot;.</li>
+</ol>
+<h2 id="מה-אומת-היום-ומה-לא">מה אומת היום ומה לא</h2>
+<div class="tbl"><table><thead><tr><th>פריט</th><th>סטטוס</th><th>קישור</th></tr></thead><tbody><tr><td>Yahoo chart v8 AAPL 1m — בדיקת העורך 17:02:28Z (HTTP 200, נר אחרון = זמן הבקשה)</td><td>✅ אומת היום</td><td><a href="https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1m&range=1d" target="_blank" rel="noopener">https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1m&amp;range=1d</a></td></tr>
+<tr><td>Yahoo <code>range=max</code> מחזיר 3mo (169 נרות); <code>range=5y</code> מחזיר 1d (1,255) — העורך 17:03:42Z</td><td>✅ אומת היום (מכריע A4 מול A3)</td><td><a href="https://query2.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d&range=max" target="_blank" rel="noopener">https://query2.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d&amp;range=max</a></td></tr>
+<tr><td>Yahoo <code>query1</code> 429 בקריאה ראשונה (A4) מול 200 (A3, העורך)</td><td>⚠️ לא הוכרע</td><td>—</td></tr>
+<tr><td>Yahoo איחור TASE: שדה 15 (A3) מול טבלה 20 דק&#39;</td><td>⚠️ לא הוכרע</td><td><a href="https://help.yahoo.com/kb/SLN2310.html" target="_blank" rel="noopener">https://help.yahoo.com/kb/SLN2310.html</a></td></tr>
+<tr><td>Stooq CSV <code>q/l</code> → 404; <code>q/d/l</code> → אתגר JS — העורך 17:02:30Z</td><td>❌ נכשל (3 בדיקות)</td><td><a href="https://stooq.com/q/l/?s=aapl.us&f=sd2t2ohlcv&h&e=csv" target="_blank" rel="noopener">https://stooq.com/q/l/?s=aapl.us&amp;f=sd2t2ohlcv&amp;h&amp;e=csv</a></td></tr>
+<tr><td>Alpha Vantage GLOBAL_QUOTE IBM <code>apikey=demo</code> → 221.29, latest trading day 2026-10-06 — העורך 17:02:31Z</td><td>✅ אומת היום (סוף יום, לא זמן אמת)</td><td><a href="https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=demo" target="_blank" rel="noopener">https://www.alphavantage.co/query?function=GLOBAL_QUOTE&amp;symbol=IBM&amp;apikey=demo</a></td></tr>
+<tr><td>Twelve Data <code>demo</code> AAPL 336.11, איחור ~דקה</td><td>✅ אומת היום (A1)</td><td><a href="https://twelvedata.com/pricing" target="_blank" rel="noopener">https://twelvedata.com/pricing</a></td></tr>
+<tr><td>EODHD <code>demo</code> AAPL 335.42, איחור 15 דק&#39;</td><td>✅ אומת היום (A1)</td><td><a href="https://eodhd.com/financial-apis/live-realtime-stocks-api" target="_blank" rel="noopener">https://eodhd.com/financial-apis/live-realtime-stocks-api</a></td></tr>
+<tr><td>dxFeed demo AAPL 335.70 + bid/ask, 15 דק&#39;</td><td>✅ אומת היום (A2)</td><td><a href="https://kb.dxfeed.com/en/getting-started.html" target="_blank" rel="noopener">https://kb.dxfeed.com/en/getting-started.html</a></td></tr>
+<tr><td>Nasdaq.com bid/ask 336.11/336.16, 10 שנות היסטוריה, marketmovers</td><td>✅ אומת היום (A3)</td><td><a href="https://www.nasdaq.com/legal" target="_blank" rel="noopener">https://www.nasdaq.com/legal</a></td></tr>
+<tr><td>Cboe delayed JSON, 3,568 חוזים עם Greeks, 15 דק&#39;</td><td>✅ אומת היום (A3, A4)</td><td><a href="https://www.cboe.com/terms" target="_blank" rel="noopener">https://www.cboe.com/terms</a></td></tr>
+<tr><td>TradingView scanner <code>delayed_streaming_900</code></td><td>✅ אומת היום (A3)</td><td><a href="https://www.tradingview.com/policies/" target="_blank" rel="noopener">https://www.tradingview.com/policies/</a></td></tr>
+<tr><td>Finviz &quot;delayed by 1 minute&quot;; Elite $39.50</td><td>✅ אומת היום (A3)</td><td><a href="https://finviz.com/elite" target="_blank" rel="noopener">https://finviz.com/elite</a></td></tr>
+<tr><td>Google Finance scrape; TASE 20 דק&#39;</td><td>✅ אומת היום (A3)</td><td><a href="https://www.google.com/googlefinance/disclaimer/" target="_blank" rel="noopener">https://www.google.com/googlefinance/disclaimer/</a></td></tr>
+<tr><td>CNBC <code>quote.htm</code> זמן אמת + CORS <code>*</code>; <code>restQuote.htm</code> 404</td><td>✅/❌ אומת היום (A3)</td><td>—</td></tr>
+<tr><td><code>api.tase.co.il</code> TEVA 11990 אג&#39;, historyeod</td><td>✅ אומת היום (A4)</td><td>—</td></tr>
+<tr><td>Börse Frankfurt SAP 188.02; אי־התאמה מול Yahoo 187.62</td><td>✅ עובד / ⚠️ לא הוכרע (A4)</td><td>—</td></tr>
+<tr><td>Yahoo options v7 (crumb), 23 פקיעות, 15 דק&#39;</td><td>✅ אומת היום (A4)</td><td>—</td></tr>
+<tr><td>Yahoo screener day_gainers</td><td>✅ אומת היום (A3, A4)</td><td>—</td></tr>
+<tr><td>Alpha Vantage HISTORICAL_OPTIONS IBM demo (2,112 חוזים, 2026-10-06)</td><td>✅ אומת היום (A1, A4)</td><td><a href="https://www.alphavantage.co/documentation/" target="_blank" rel="noopener">https://www.alphavantage.co/documentation/</a></td></tr>
+<tr><td>Alpaca: תיעוד Basic/IEX/200 לדקה/Paper Only &quot;Anyone globally&quot;/ToS</td><td>✅ תיעוד אומת היום; API 📄 (401)</td><td><a href="https://docs.alpaca.markets/docs/paper-trading" target="_blank" rel="noopener">https://docs.alpaca.markets/docs/paper-trading</a></td></tr>
+<tr><td>Alpaca movers פתוח ל־Basic?</td><td>לא אומת</td><td><a href="https://docs.alpaca.markets/reference/movers-1" target="_blank" rel="noopener">https://docs.alpaca.markets/reference/movers-1</a></td></tr>
+<tr><td>Tradier sandbox דורש חשבון ברוקראז&#39;?</td><td>⚠️ לא הוכרע (תיעוד נוכחי מול כתבות 2014)</td><td><a href="https://docs.tradier.com/docs/market-data.md" target="_blank" rel="noopener">https://docs.tradier.com/docs/market-data.md</a></td></tr>
+<tr><td>IBKR: חשבון ממומן נדרש; $500 מינימום לנתונים</td><td>✅ אומת היום (A2)</td><td><a href="https://www.interactivebrokers.com/en/pricing/market-data-pricing.php" target="_blank" rel="noopener">https://www.interactivebrokers.com/en/pricing/market-data-pricing.php</a></td></tr>
+<tr><td>Databento: כרטיס אשראי חובה</td><td>✅ אומת היום (A2)</td><td><a href="https://databento.com/blog/why-payment-information-required" target="_blank" rel="noopener">https://databento.com/blog/why-payment-information-required</a></td></tr>
+<tr><td>Databento Standard מחיר; Finnhub מגבלות/תמחור; FMP כל הדפים (403); Intrinio/Barchart</td><td>לא אומת</td><td>—</td></tr>
+<tr><td>Massive תמחור מניות ואופציות ($0 / $29 / $79)</td><td>✅ אומת היום (A1, A4)</td><td><a href="https://massive.com/pricing" target="_blank" rel="noopener">https://massive.com/pricing</a></td></tr>
+<tr><td>Massive = Polygon.io (שינוי שם)</td><td>לא אומת באתר הרשמי; שני הדומיינים עונים זהה</td><td><a href="https://fisd.net/polygon-io-is-now-massive" target="_blank" rel="noopener">https://fisd.net/polygon-io-is-now-massive</a></td></tr>
+<tr><td>Tiingo: IEX רק ב־Power; אין CORS</td><td>✅ אומת היום (A1)</td><td><a href="https://www.tiingo.com/about/pricing" target="_blank" rel="noopener">https://www.tiingo.com/about/pricing</a></td></tr>
+<tr><td>EODHD כולל TASE?</td><td>לא אומת</td><td><a href="https://eodhd.com/pricing" target="_blank" rel="noopener">https://eodhd.com/pricing</a></td></tr>
+<tr><td>TASE DataHub: פורטל סגור (401, OIDC); 4 מוצרים חינמיים</td><td>✅ סגירה אומתה; מוצרים לא אומת (tasepy)</td><td><a href="https://pypi.org/project/tasepy/" target="_blank" rel="noopener">https://pypi.org/project/tasepy/</a></td></tr>
+<tr><td>moomoo: ישראל לא נתמכת</td><td>לא אומת</td><td><a href="https://www.moomoo.com/us/learn/moomoo-available-countries" target="_blank" rel="noopener">https://www.moomoo.com/us/learn/moomoo-available-countries</a></td></tr>
+<tr><td>Cboe All Access: כרטיס אשראי לניסיון</td><td>✅ אומת היום (A4); מחיר Tier 1 לא אומת</td><td><a href="https://datashop.cboe.com/cboe-all-access-api" target="_blank" rel="noopener">https://datashop.cboe.com/cboe-all-access-api</a></td></tr>
+<tr><td>Schwab/Webull דרישות חשבון</td><td>Webull ✅ (FAQ); Schwab לא אומת (מקורות משניים)</td><td><a href="https://developer.webull.com/apis/docs/faq" target="_blank" rel="noopener">https://developer.webull.com/apis/docs/faq</a></td></tr>
+<tr><td>B1: IBKR paper top-of-book, $1M, &quot;stops always simulated&quot;</td><td>✅ אומת היום</td><td><a href="https://ibkrguides.com/clientportal/aboutpapertradingaccounts.htm" target="_blank" rel="noopener">https://ibkrguides.com/clientportal/aboutpapertradingaccounts.htm</a></td></tr>
+<tr><td>B1: TradingView Ask/Bid, עמלה כבויה, מרג&#39;ין</td><td>✅ אומת היום</td><td><a href="https://www.tradingview.com/support/solutions/43000647247" target="_blank" rel="noopener">https://www.tradingview.com/support/solutions/43000647247</a></td></tr>
+<tr><td>B1: Alpaca paper NBBO, 10% חלקי, בלי בדיקת נזילות</td><td>✅ אומת היום</td><td><a href="https://docs.alpaca.markets/docs/paper-trading" target="_blank" rel="noopener">https://docs.alpaca.markets/docs/paper-trading</a></td></tr>
+<tr><td>B1: NinjaTrader מתגי מילוי; החלקה בטיקים</td><td>✅ אומת היום</td><td><a href="https://static.ninjatrader.com/support/helpGuides/nt8/options_trading.htm" target="_blank" rel="noopener">https://static.ninjatrader.com/support/helpGuides/nt8/options_trading.htm</a></td></tr>
+<tr><td>B1: Webull FAQ, WSS rules, HTMW, MT5, TradeStation</td><td>✅ אומת היום</td><td><a href="https://www.wallstreetsurvivor.com/rules/" target="_blank" rel="noopener">https://www.wallstreetsurvivor.com/rules/</a></td></tr>
+<tr><td>B1: Schwab paperMoney &quot;theoretical fill&quot;, Investopedia FAQ, MarketWatch מצב האתר, IBKR KB</td><td>לא אומת (403/401)</td><td><a href="https://www.schwab.com/content/thinkorswim-papermoney-stock-trading-simulator" target="_blank" rel="noopener">https://www.schwab.com/content/thinkorswim-papermoney-stock-trading-simulator</a></td></tr>
+<tr><td>B1: ציטוטי משתמשים מסומנים (לא אומת) ב־reddit/futures.io/nexusfi/tapeboard/coincub</td><td>לא אומת</td><td>—</td></tr>
+<tr><td>B1: טענות &quot;מזיכרון&quot; (IBKR שורט/עמלות בנייר, MT5 סטופ בפער, T212 stop-out 50%)</td><td>לא אומת, ללא קישור</td><td>—</td></tr>
+<tr><td>B2: כל קטעי הקוד (Lean, zipline, backtrader, backtesting.py, vectorbt, Nautilus, PyBroker, Lumibot)</td><td>✅ אומת היום מול HEAD</td><td><a href="https://github.com/QuantConnect/Lean" target="_blank" rel="noopener">https://github.com/QuantConnect/Lean</a></td></tr>
+<tr><td>B2: Lean BrokerageModel מציב EquityFillModel; מינוף 2x ברירת מחדל</td><td>לא אומת (קובץ לא על הדיסק)</td><td>—</td></tr>
+<tr><td>B2: Roll, CS, AR, EDGE, Amihud, Kyle, Tóth, Gatheral, Almgren 2005, Almgren–Chriss — DOI</td><td>✅ אומת היום מול Crossref</td><td><a href="https://doi.org/10.1016/j.jfineco.2024.103916" target="_blank" rel="noopener">https://doi.org/10.1016/j.jfineco.2024.103916</a></td></tr>
+<tr><td>B2: Y≈0.7 (0.5–1), ספרד 1–5% במניות קטנות, עמלת HTB 3–30%, צורת h(v) הלינארית, &quot;שליש–חצי מהחלונות&quot; ב־Roll</td><td>לא אומת</td><td>—</td></tr></tbody></table></div>
+<h2 id="נספח-חלקי-העובדים">נספח — חלקי העובדים</h2>
+<div class="tbl"><table><thead><tr><th>קובץ</th><th>מצב</th><th>גודל</th><th>פערים שנמצאו</th></tr></thead><tbody><tr><td><code>parts/A1.md</code> — ספקים עם מפתח (ארה&quot;ב)</td><td>קיים</td><td>24,990 בייט</td><td>Finnhub: מגבלות ותמחור לא אומתו (JS), טענת 60/דקה ללא קישור. FMP: כל הדפים 403, בדיקה ❌. Massive/Tiingo/Marketstack: אין demo → 📄. דפי הרשמה לא נבדקו לעומק (רק Twelve Data ו־AV).</td></tr>
+<tr><td><code>parts/A2.md</code> — ברוקרים</td><td>קיים</td><td>29,807 בייט</td><td>אין מפתחות לאף ברוקר → רובם 📄 עם שגיאת 401 בלבד. Tradier: סתירה בין תיעוד 2026 לכתבות 2014 לא הוכרעה. Databento Standard מחיר, זמינות לישראל ב־Tradier/Schwab/Webull, שדות הרשמה של Alpaca: לא אומתו. Schwab מבוסס על מקורות משניים בלבד.</td></tr>
+<tr><td><code>parts/A3.md</code> — ללא מפתח (ארה&quot;ב)</td><td>קיים</td><td>24,696 בייט</td><td>Stooq ❌; CNBC <code>restQuote</code> ❌. ToS של Finviz (404) ו־CNBC (403) לא נקראו. A3 כתב ש־<code>range=max</code> נותן יומי מ־1984 — העורך תיקן ל־3mo. TradingView CORS לא נבדק בדפדפן אמיתי.</td></tr>
+<tr><td><code>parts/A4.md</code> — TASE/אירופה/אסיה/אופציות</td><td>קיים</td><td>31,330 בייט</td><td>TASE DataHub סגור, המוצרים החינמיים לא אומתו מול TASE. <code>api.tase.co.il</code> תוך־יומי לא נבדק (בורסה סגורה). Börse Frankfurt אי־התאמה מול Yahoo לא הוכרעה. JPX לא נבדק. Euronext/Investing/Maya ❌. ToS של Börse Frankfurt ו־optionsDX לא נקראו.</td></tr>
+<tr><td><code>parts/B1.md</code> — חשבונות דמו</td><td>קיים</td><td>47,960 בייט</td><td>IBKR KB, Schwab paperMoney, Investopedia FAQ, MarketWatch חסומים (403/401) → טענות (לא אומת). מספר טענות &quot;מזיכרון&quot; ללא קישור (סומנו). Webull: מודל מילוי/שורט/מרג&#39;ין לא נמצאו. TradeStation: כמעט הכול לא נמצא. מצב MarketWatch VSE ב־2026 לא ידוע.</td></tr>
+<tr><td><code>parts/B2.md</code> — קוד פתוח + נוסחאות</td><td>קיים</td><td>52,083 בייט</td><td>Lean BrokerageModel ומינוף 2x לא אומתו בקוד. backtrader ו־Nautilus נבדקו חלקית דרך סוכן משנה. Y בחוק השורש, ספרד טיפוסי במניות קטנות, עמלות HTB: לא אומתו. SSRN 403. אין מימוש קוד ל־Amihud/Kyle.</td></tr></tbody></table></div>
+<p>DONE</p>
+
+</main>
+<a class="top" href="#">למעלה ↑</a>
+<script>
+// colour the three verification labels
+const map={'נבדק ועובד':'tag-ok','נקרא בלבד':'tag-warn','נכשל':'tag-bad','נפסל כחינם':'tag-bad','אומת היום':'tag-ok','לא אומת':'tag-warn'};
+const walker=document.createTreeWalker(document.querySelector('main'),NodeFilter.SHOW_TEXT);
+const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+for(const n of nodes){if(n.parentNode.closest('pre,code,a'))continue;let t=n.nodeValue;let hit=false;for(const k in map){if(t.includes(k)){hit=true;t=t.split(k).join('\u0000'+k+'\u0001');}}
+if(!hit)continue;const frag=document.createDocumentFragment();t.split(/(\u0000[^\u0001]+\u0001)/).forEach(p=>{if(p.startsWith('\u0000')){const k=p.slice(1,-1);const s=document.createElement('span');s.className=map[k];s.textContent=k;frag.appendChild(s);}else if(p)frag.appendChild(document.createTextNode(p));});n.parentNode.replaceChild(frag,n);}
+// insert TOC after the first h1
+const h1=document.querySelector('main h1');if(h1){const nav=document.createElement('nav');nav.className='toc';nav.innerHTML='<details open><summary>תוכן</summary><ul><li class="d2"><a href="#תקציר-והמלצות">תקציר והמלצות</a></li><li class="d2"><a href="#חלק-א-מקורות-נתוני-שוק">חלק א — מקורות נתוני שוק</a></li><li class="d3"><a href="#טבלת-השוואה-ראשית">טבלת השוואה ראשית</a></li><li class="d3"><a href="#מטריצת-צרכים-1-6">מטריצת צרכים 1–6</a></li><li class="d3"><a href="#פירוט-לכל-מקור">פירוט לכל מקור</a></li><li class="d2"><a href="#חלק-ב-מה-אפשר-ללמוד-מחשבונות-דמו-קיימים">חלק ב — מה אפשר ללמוד מחשבונות דמו קיימים</a></li><li class="d3"><a href="#טבלת-פלטפורמות">טבלת פלטפורמות</a></li><li class="d3"><a href="#תשובות-לפי-פלטפורמה">תשובות לפי פלטפורמה</a></li><li class="d3"><a href="#סימולטורים-בקוד-פתוח">סימולטורים בקוד פתוח</a></li><li class="d3"><a href="#נוסחאות-להערכת-ספרד-והחלקה-מנתונים-יומיים">נוסחאות להערכת ספרד והחלקה מנתונים יומיים</a></li><li class="d3"><a href="#מסכים-וכלים-שחוזרים-אצל-כולם">מסכים וכלים שחוזרים אצל כולם</a></li><li class="d3"><a href="#מה-כדאי-להעתיק">מה כדאי להעתיק</a></li><li class="d3"><a href="#טעויות-שכדאי-להימנע-מהן">טעויות שכדאי להימנע מהן</a></li><li class="d2"><a href="#מה-אומת-היום-ומה-לא">מה אומת היום ומה לא</a></li><li class="d2"><a href="#נספח-חלקי-העובדים">נספח — חלקי העובדים</a></li></ul></details>';h1.insertAdjacentElement('afterend',nav);}
+</script>
+</body>
+</html>
