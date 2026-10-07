@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תוכנית עבודה: סימולטור מסחר במניות בכסף וירטואלי — v1</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--fg:#1d1d1f;--muted:#6e6e73;--line:#e5e5ea;--bg:#fff;--soft:#f5f5f7;--acc:#0a66c2;--ok:#1a7f37;--warn:#9a6700;--bad:#b42318}
+@media (prefers-color-scheme:dark){:root{--fg:#f5f5f7;--muted:#a1a1a6;--line:#2c2c2e;--bg:#000;--soft:#1c1c1e;--acc:#4da3ff;--ok:#3fb950;--warn:#d4a72c;--bad:#f85149}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans Hebrew",sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 80px}
+h1{font-size:1.7rem;line-height:1.25;margin:.4em 0 .2em;letter-spacing:-.01em}
+h2{font-size:1.35rem;margin:2.2em 0 .6em;padding-top:.6em;border-top:1px solid var(--line)}
+h3{font-size:1.12rem;margin:1.6em 0 .4em}
+h4{font-size:1rem;margin:1.2em 0 .3em;color:var(--muted)}
+p,li{max-width:70ch}
+a{color:var(--acc);text-decoration:none;word-break:break-word}a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--soft);padding:.1em .35em;border-radius:5px;direction:ltr;unicode-bidi:embed}
+pre{direction:ltr;text-align:left;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow:auto;font-size:.82rem;line-height:1.5}
+pre code{background:none;padding:0;font-size:inherit}
+blockquote{margin:1em 0;padding:.4em 1em;border-right:3px solid var(--line);color:var(--muted)}
+.tbl{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1em -16px;padding:0 16px}
+table{border-collapse:collapse;font-size:.86rem;min-width:600px}
+th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:right}
+th{background:var(--soft);position:sticky;top:0;font-weight:600}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--soft) 55%,transparent)}
+.meta{color:var(--muted);font-size:.9rem}
+nav.toc{background:var(--soft);border-radius:12px;padding:12px 16px;margin:18px 0 26px;font-size:.93rem}
+nav.toc ul{list-style:none;margin:0;padding:0;columns:1}
+nav.toc li.d3{padding-right:16px;font-size:.88rem;color:var(--muted)}
+nav.toc summary{cursor:pointer;font-weight:600}
+.tag-ok,.tag-warn,.tag-bad{font-weight:600}
+.tag-ok{color:var(--ok)}.tag-warn{color:var(--warn)}.tag-bad{color:var(--bad)}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+.top{position:fixed;bottom:18px;left:18px;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:.85rem}
+@media (min-width:700px){nav.toc ul{columns:2}}
+</style>
+</head>
+<body>
+<main>
+<p class="meta">נבנה 2026-10-07 17:42 UTC</p>
+<h1 id="תוכנית-עבודה-סימולטור-מסחר-במניות-בכסף-וירטואלי-v1">תוכנית עבודה: סימולטור מסחר במניות בכסף וירטואלי — v1</h1>
+<p>נכתב 7.10.2026, על בסיס המחקר: <a href="https://torahworldwide.github.io/stock-sim-research/" target="_blank" rel="noopener">https://torahworldwide.github.io/stock-sim-research/</a>
+עותק מקומי של הדוח ב-VM: <code>/home/ubuntu/stock-sim-research/report.md</code> (הנוסחאות בסעיף &quot;נוסחאות להערכת ספרד והחלקה מנתונים יומיים&quot;).</p>
+<hr>
+<h2 id="0-הוראות-לבונה-claude-code">0. הוראות לבונה (Claude Code)</h2>
+<ul>
+<li><strong>הלקוח:</strong> תומר, לא מתכנת, קורא בטלפון. UI בעברית, RTL, מובייל קודם. סגנון Apple: נקי, מינימלי, אוויר, בלי צפיפות ובלי &quot;אנדרואידי&quot;. מצב כהה/בהיר לפי המערכת.</li>
+<li><strong>שיטת עבודה:</strong> לבנות לפי אבני הדרך בסעיף 7, בסדר. אחרי כל אבן דרך: הבדיקות עוברות → <code>git commit</code> → הודעה קצרה בעברית: מה נבנה, איך לבדוק. אחרי אבן דרך <strong>2.3</strong> לשלוח קישור חי ולעצור לאישור של תומר לפני ההמשך.</li>
+<li><strong>אסור:</strong> לשכתב היסטוריית git או force-push (כל שינוי = commit חדש). להוסיף מסכים, כפתורים או הגדרות שלא בתוכנית בלי לשאול. למלא פקודה &quot;במחיר שעל המסך&quot; (סעיף 4 מחייב). לשים מפתחות או טוקנים בקוד צד-לקוח.</li>
+<li><strong>כשיש ספק במנוע הביצוע:</strong> ההנחה הפסימית. עדיף סימולטור שמחמיר על סימולטור שמחמיא.</li>
+<li><strong>שפה בקוד:</strong> מחרוזות UI בעברית; קוד, הערות ושמות משתנים באנגלית.</li>
+<li><strong>שאלות:</strong> לשאול שאלה אחת פשוטה בכל פעם, רק אם באמת חוסמת. אחרת להחליט ולכתוב בהודעת הסיכום מה הוחלט.</li>
+</ul>
+<hr>
+<h2 id="1-מטרה-ועקרונות">1. מטרה ועקרונות</h2>
+<ul>
+<li>לבדוק לאורך זמן אם מסחר קצר וספקולטיבי מרוויח, בכסף וירטואלי, בתנאים הכי קרובים למציאות, כולל ההפסדים מביצוע גרוע במניות קטנות.</li>
+<li>הון התחלתי: <strong>₪10,000</strong>. מטבע בסיס: שקל. כל רווח/הפסד מוצג בשקלים (כולל אפקט שער).</li>
+<li>כל מניה שמקור הנתונים מכסה: ארה&quot;ב, תל אביב, אירופה, אסיה. ליד כל מניה: הבורסה <strong>והאיחור של המחיר</strong> (ארה&quot;ב ~זמן אמת, ת&quot;א/אירופה/אסיה 15–20 דק&#39;).</li>
+<li>כל עסקה שומרת &quot;<strong>המחיר שראיתי</strong>&quot; מול &quot;<strong>מחיר הביצוע</strong>&quot;. זו העמודה שאין באף דמו, והיא מודדת כמה הביצוע עולה.</li>
+</ul>
+<hr>
+<h2 id="2-ארכיטקטורה-החלטות-סגורות">2. ארכיטקטורה (החלטות סגורות)</h2>
+<ul>
+<li><strong>Repo:</strong> <code>TorahWorldWide/stock-sim</code> (חדש), monorepo: <code>server/</code>, <code>web/</code>, <code>shared/</code>. רץ על ה-VM תחת <code>/home/ubuntu/stock-sim</code>.</li>
+<li><strong>Server:</strong> Node 22 + TypeScript + Fastify + better-sqlite3 (<code>data/sim.db</code>). השרת הוא גם ה-proxy לנתונים (ל-Yahoo אין CORS, לכן דפדפן לבד לא מספיק) וגם מנוע הביצוע. כל ההיגיון הכספי בשרת, לא בדפדפן.</li>
+<li><strong>Client:</strong> Vite + React + TypeScript. גרפים: <strong>Lightweight Charts</strong> (הספרייה הפתוחה של TradingView). לא PWA (נדחה בעבר).</li>
+<li><strong>Scheduler בשרת:</strong> כל 10 שניות בשעות מסחר: רענון מחירים לסמלים &quot;חיים&quot; (פוזיציות, פקודות פתוחות, רשימת מעקב, מסך פתוח) → הערכת פקודות פתוחות → בדיקת מרג&#39;ין. פעם ביום אחרי סגירת כל בורסה: ריבית, עמלת השאלה, סטטיסטיקות, גיבוי.</li>
+<li><strong>Hosting:</strong> systemd user service <code>stock-sim.service</code>, פורט 3011. יום ראשון: Quick Tunnel (<code>~/serve.sh 3011</code>). קבוע: Cloudflare named tunnel → <code>sim.torah-worldwide.com</code> (סעיף 8).</li>
+<li><strong>גיבוי:</strong> <code>data/backups/sim-YYYY-MM-DD.db</code> יומי, שמירת 30 ימים; עותק שבועי ל-R2 אם הטוקן הקיים מאפשר (אחרת לדלג ולכתוב זאת בסיכום).</li>
+<li><strong>בדיקות:</strong> vitest למנוע הביצוע (חובה, סעיף 4.9); Playwright smoke לשלושה מסכים (חיפוש → דף מניה → פקודה).</li>
+</ul>
+<hr>
+<h2 id="3-שכבת-נתונים">3. שכבת נתונים</h2>
+<h3 id="3-1-מקורות-אומתו-7-10-2026">3.1 מקורות (אומתו 7.10.2026)</h3>
+<p><strong>ראשי — Yahoo Finance (API לא רשמי).</strong></p>
+<ul>
+<li>נרות: <code>https://query1.finance.yahoo.com/v8/finance/chart/{SYMBOL}?interval=1m&amp;range=1d</code><ul>
+<li><code>1m</code> זמין עד 30 יום אחורה (<code>range=1d</code>..<code>7d</code> לבקשה), <code>5m</code> עד 60 יום, <code>1d</code> ללא הגבלה <strong>רק עם</strong> <code>period1</code>/<code>period2</code> (Unix seconds). לא להשתמש ב-<code>range=max</code> עם <code>interval=1d</code> (מחזיר נרות של 3 חודשים).</li>
+</ul>
+</li>
+<li>מטא מתוך אותה תשובה (<code>chart.result[0].meta</code>): <code>regularMarketPrice</code>, <code>regularMarketTime</code>, <code>currency</code>, <code>exchangeName</code>, <code>fullExchangeName</code>, <code>exchangeTimezoneName</code>, <code>exchangeDataDelayedBy</code>, <code>currentTradingPeriod.regular.{start,end}</code>. מכאן: המחיר, האיחור, שעות המסחר, המטבע.</li>
+<li>חיפוש: <code>https://query1.finance.yahoo.com/v1/finance/search?q={text}&amp;quotesCount=10&amp;newsCount=0</code> → <code>quotes[]</code> עם <code>symbol</code>, <code>shortname</code>, <code>exchange</code>, <code>quoteType</code> (לסנן <code>EQUITY</code> ו-<code>ETF</code>).</li>
+<li>עולות/יורדות (ארה&quot;ב): <code>https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?scrIds=day_gainers&amp;count=25</code> ו-<code>day_losers</code>. דורש cookie+crumb: <code>GET https://fc.yahoo.com</code> (לוקחים את ה-cookie מהתשובה, גם אם 404) ואז <code>GET https://query1.finance.yahoo.com/v1/test/getcrumb</code> עם ה-cookie; מוסיפים <code>&amp;crumb=</code> לבקשות. לשמור cookie+crumb ל-12 שעות.</li>
+<li>פרטי חברה (שווי שוק) : <code>https://query1.finance.yahoo.com/v7/finance/quote?symbols=AAPL,TEVA.TA&amp;crumb=...</code> (אותו cookie) → <code>marketCap</code>, <code>bid</code>, <code>ask</code>, <code>averageDailyVolume3Month</code>. אם נכשל: לסווג גודל לפי <code>ADV20 × מחיר</code>.</li>
+<li>שערי מטבע: <code>ILS=X</code> (USD→ILS), <code>EURILS=X</code>, <code>GBPILS=X</code>, <code>JPYILS=X</code>, <code>HKDILS=X</code>, <code>GBp</code> (לונדון מצטטת בפני, לחלק ב-100).</li>
+<li><strong>חובה:</strong> header <code>User-Agent</code> של דפדפן (בלי זה 429 מיידי). לתמוך ב-<code>query1</code> וב-<code>query2</code> עם מעבר אוטומטי. על 429: backoff אקספוננציאלי (2s, 4s, 8s, מקס 60s) ואינדיקטור &quot;מקור נתונים איטי&quot; בממשק.</li>
+</ul>
+<p><strong>גיבוי (אבן דרך 2.6, אופציונלי) — Alpaca Market Data, תוכנית Basic.</strong> ארה&quot;ב בלבד, זמן אמת מבורסת IEX, 200 בקשות לדקה, מפתח ב-<code>.env</code> (<code>ALPACA_KEY</code>, <code>ALPACA_SECRET</code>). מעבר אוטומטי אם Yahoo נכשל 3 פעמים ברצף; חזרה ל-Yahoo אחרי 5 דק&#39;.</p>
+<p><strong>אופציות (שלב 4) — Cboe:</strong> <code>https://cdn.cboe.com/api/global/delayed_quotes/options/{SYMBOL}.json</code> — שרשרת מלאה עם bid/ask, כמויות, IV ויווניות, איחור 15 דק&#39;. ארה&quot;ב בלבד.</p>
+<h3 id="3-2-cache-ב-sqlite">3.2 Cache ב-SQLite</h3>
+<div class="tbl"><table><thead><tr><th>טבלה</th><th>TTL / היקף</th></tr></thead><tbody><tr><td><code>quotes</code> (מחיר אחרון + זמן)</td><td>10 שניות בשעות מסחר, 5 דק&#39; מחוצה להן</td></tr>
+<tr><td><code>bars_1m</code></td><td>3 ימי מסחר אחורה לכל סמל חי; רענון פעם בדקה כל עוד הסמל &quot;חי&quot;</td></tr>
+<tr><td><code>bars_1d</code></td><td>היסטוריה מלאה; רענון פעם ביום אחרי הסגירה</td></tr>
+<tr><td><code>symbol_meta</code></td><td>24 שעות</td></tr>
+<tr><td><code>fx</code></td><td>60 שניות</td></tr>
+<tr><td><code>movers</code></td><td>60 שניות</td></tr></tbody></table></div>
+<h3 id="3-3-סטטיסטיקות-לכל-סמל-מנרות-יומיים-מחושבות-פעם-ביום">3.3 סטטיסטיקות לכל סמל (מנרות יומיים, מחושבות פעם ביום)</h3>
+<ul>
+<li><code>adv20</code> = ממוצע נפח 20 יום. <code>sigma20</code> = סטיית תקן של <code>ln(C_t / C_{t-1})</code> על 20 יום.</li>
+<li><code>spread_est</code> = אומדן <strong>EDGE</strong> (Ardia, Guidotti &amp; Kroencke 2024) על 21 נרות יומיים (O,H,L,C). להעביר ל-TypeScript מ-<code>/home/ubuntu/stock-sim-research/src/bidask/python/bidask/edge.py</code> (שורות 40–107; רישיון MIT; <code>sign=True</code>, תוצאה שלילית → 0). רצפה: <code>spread_est ≥ 2 × tick / price</code> (tick = 0.01 במטבע הציטוט; בת&quot;א המחיר באגורות, tick = 0.1). אם יש פחות מ-21 נרות: להשתמש ב-Corwin–Schultz על מה שיש, ולסמן &quot;אומדן חלש&quot;.</li>
+<li><code>illiq20</code> = Amihud: ממוצע של <code>|r_d| / (P_d × V_d)</code> על 20 יום. משמש לדירוג נזילות (דצילים בתוך כל ה-watchlist/positions).</li>
+<li><code>market_cap</code> מ-<code>v7/quote</code>; אם אין: <code>size_class</code> לפי <code>adv20 × price</code>.</li>
+<li><code>short_class</code> לפי סעיף 4.5.</li>
+</ul>
+<hr>
+<h2 id="4-מנוע-הביצוע-הלב-של-הפרויקט-חוקים-מחייבים">4. מנוע הביצוע (הלב של הפרויקט) — חוקים מחייבים</h2>
+<h3 id="4-1-כללי">4.1 כללי</h3>
+<ul>
+<li>פקודה נשמרת עם <code>placed_at</code> (UTC) ו-<code>seen_price</code> (המחיר שהיה על המסך ברגע הלחיצה) ו-<code>seen_price_time</code>.</li>
+<li><strong>מחיר ייחוס לביצוע</strong> = המחיר הראשון שחותמת הזמן שלו <strong>גדולה</strong> מ-<code>placed_at</code>. בבורסה עם איחור (ת&quot;א, אירופה, אסיה): הפקודה ממתינה עד שהפיד המושהה עובר את <code>placed_at</code>, ומוצגת &quot;ממתינה לביצוע · הנתונים באיחור 20 דק&#39;&quot;. לעולם לא מחיר שחותמתו ≤ <code>placed_at</code> (זו הפרצה של &quot;לנצח את העתיד&quot;).</li>
+<li>כל מחיר ביצוע <strong>נחסם לתוך <code>[low, high]</code></strong> של נר הדקה שבו הוא בוצע. מחיר שלא היה בשוק לא קיים.</li>
+<li>מסחר רק בשעות המסחר הרגילות של הבורסה של המניה (מה-meta). פקודה מחוץ לשעות נכנסת לתור ומוערכת מול הנר <strong>הראשון אחרי הפתיחה</strong>, כולל הגאפ.</li>
+<li>כל מילוי נרשם בנפרד (גם חלקי). לא קיים &quot;ביצוע מיידי במחיר המסך&quot;.</li>
+</ul>
+<h3 id="4-2-עלות-ביצוע-לכל-מילוי-חד-כיווני">4.2 עלות ביצוע לכל מילוי (חד-כיווני)</h3>
+<pre><code>cost = spread_est / 2 + Y * sigma20 * sqrt(Q / adv20)        # Y = 0.7 (config: 0.5–1.0)
+buy / cover:  fill = ref * (1 + cost)
+sell / short: fill = ref * (1 - cost)
+</code></pre>
+<p>מקור: חוק השורש (Tóth 2011, Almgren 2005) + מבנה &quot;חצי ספרד + השפעה&quot; (Almgren–Chriss). לא להשתמש בנוסחת <code>0.1 × share²</code> של zipline/Lean (נותנת כמעט אפס).</p>
+<h3 id="4-3-נזילות-ומילוי-חלקי">4.3 נזילות ומילוי חלקי</h3>
+<ul>
+<li>כמות מקסימלית למילוי בנר דקה = <code>participation × volume_bar</code>, <code>participation = 0.10</code> (config; שמרני 0.025). היתרה ממשיכה לנרות הבאים באותו יום. Day → היתרה מבוטלת בסגירה. GTC → ממשיכה למחר (עד 90 יום).</li>
+<li>אם לנר אין נפח (0) → אין מילוי בנר הזה.</li>
+</ul>
+<h3 id="4-4-סוגי-פקודות">4.4 סוגי פקודות</h3>
+<div class="tbl"><table><thead><tr><th>פקודה</th><th>תנאי הפעלה (על נרות אחרי <code>placed_at</code>)</th><th>מחיר</th></tr></thead><tbody><tr><td>Market</td><td>הנר הראשון</td><td><code>ref = open</code> של הנר (או המחיר האחרון אם תוך-נר), ואז <code>cost</code></td></tr>
+<tr><td>Limit buy</td><td><code>low &lt; limit</code> (<strong>מעבר</strong>, לא נגיעה)</td><td><code>min(open, limit)</code>; בלי <code>cost</code> (פקודה פסיבית)</td></tr>
+<tr><td>Limit sell / Take-profit</td><td><code>high &gt; limit</code></td><td><code>max(open, limit)</code>; בלי <code>cost</code></td></tr>
+<tr><td>Stop sell (סטופ לוס)</td><td><code>low ≤ stop</code></td><td><code>(open ≤ stop ? open : stop) * (1 - cost)</code> — בגאפ מתמלא ב-<strong>open</strong></td></tr>
+<tr><td>Stop buy (כיסוי שורט)</td><td><code>high ≥ stop</code></td><td><code>(open ≥ stop ? open : stop) * (1 + cost)</code></td></tr>
+<tr><td>Bracket (סטופ + טייק יחד, OCO)</td><td>שניהם נבדקים; אם <strong>שניהם</strong> נגעו באותו נר → <strong>הסטופ מנצח</strong> (פסימי)</td><td>לפי השורות למעלה</td></tr></tbody></table></div>
+<ul>
+<li>תוקף: Day / GTC. ברירת מחדל Day.</li>
+<li>פקודה שחורגת מכוח הקנייה נדחית מיד עם סיבה ברורה.</li>
+<li>מילוי Limit/Stop כפוף גם ל-4.3 (נזילות) ול-4.1 (חסימה ל-<code>[low, high]</code>).</li>
+</ul>
+<h3 id="4-5-שורט-שלב-3">4.5 שורט (שלב 3)</h3>
+<ul>
+<li><code>short_class</code> לפי סטטיסטיקות (config):<ul>
+<li><code>NONE</code> (לא ניתן לשורט): מחיר &lt; $1 (או שווה-ערך) <strong>או</strong> <code>adv20 × price &lt; $500K</code> ליום.</li>
+<li><code>HTB</code> (קשה להשאלה): <code>adv20 × price &lt; $20M</code> ליום <strong>או</strong> שווי שוק &lt; $2B.</li>
+<li><code>ETB</code> (קל להשאלה): כל השאר.</li>
+</ul>
+</li>
+<li>עמלת השאלה שנתית: ETB 0.3%; HTB 15% בסיס, עולה עד 40% לפי דציל אי-נזילות (Amihud). נגבית יומית על שווי הפוזיציה בסגירה. מוצגת בטיקט לפני השליחה.</li>
+<li>מכירה בחסר דורשת מרג&#39;ין (4.6). כיסוי = Stop buy / Market buy לפי 4.4.</li>
+</ul>
+<h3 id="4-6-מינוף-ומרג-39-ין-שלב-3">4.6 מינוף ומרג&#39;ין (שלב 3)</h3>
+<ul>
+<li>ביטחון התחלתי 50% (כוח קנייה = 2 × הון) רק למניות &quot;ניתנות למינוף&quot;: מחיר ≥ $5 ו-<code>adv20 ≥ 100K</code>. אחרות: 100% (בלי מינוף).</li>
+<li>ביטחון תחזוקה: לונג 30%, שורט 35%.</li>
+<li>ריבית על מזומן שלילי: 8% לשנה, צבירה יומית.</li>
+<li>אזהרה (באנר עליון) כשההון בתוך 5 נקודות אחוז מעל סף התחזוקה. <strong>סגירה כפויה</strong> כשההון מתחת לסף: סוגרים פוזיציות מהמפסידה ביותר, דרך מנוע הביצוע (עם <code>cost</code>), עד שחוזרים לעמידה. נרשם כאירוע בהיסטוריה.</li>
+<li>אופציונלי (מתג ב-config, כבוי כברירת מחדל): כלל Pattern Day Trader — חשבון מתחת ל-$25,000 מוגבל ל-3 עסקאות יומיות ב-5 ימי מסחר.</li>
+</ul>
+<h3 id="4-7-עמלות-דלוקות-תמיד-שינוי-רק-ב-config-בלי-מתג-בממשק">4.7 עמלות (דלוקות תמיד; שינוי רק ב-config, בלי מתג בממשק)</h3>
+<div class="tbl"><table><thead><tr><th></th><th>עמלה</th></tr></thead><tbody><tr><td>ארה&quot;ב</td><td>$0.005 למניה, מינימום $1, מקסימום 0.5% משווי העסקה</td></tr>
+<tr><td>תל אביב</td><td>0.1% משווי העסקה, מינימום ₪10</td></tr>
+<tr><td>אירופה / אסיה</td><td>0.15%, מינימום שווה-ערך ל-$5</td></tr>
+<tr><td>המרת מטבע</td><td>0.5% מהסכום, בכל המרה (כל המזומן בשקלים; עסקה במטבע זר ממירה הלוך ושוב בשער הרגע ± 0.5%)</td></tr>
+<tr><td>ריבית מינוף</td><td>8% לשנה (4.6)</td></tr>
+<tr><td>השאלה בשורט</td><td>לפי 4.5</td></tr></tbody></table></div>
+<h3 id="4-8-רשומת-ביצוע-fills">4.8 רשומת ביצוע (fills)</h3>
+<p><code>order_id, filled_at, qty, seen_price, ref_price, fill_price, spread_est, impact_est, fee, fx_rate, fx_fee, bar_low, bar_high, partial(bool)</code>.
+&quot;עלות ביצוע&quot; של התיק = <code>Σ |fill_price − seen_price| × qty</code> (בשקלים) + כל העמלות. מוצגת בתיק ובהיסטוריה.</p>
+<h3 id="4-9-בדיקות-חובה-למנוע-vitest-מנותקות-מרשת-נרות-סינתטיים">4.9 בדיקות חובה למנוע (vitest, מנותקות מרשת, נרות סינתטיים)</h3>
+<ol>
+<li>Market buy: <code>fill = open × (1 + cost)</code> ונמצא בתוך <code>[low, high]</code>.</li>
+<li>מניה קטנה (<code>adv20</code> קטן) מקבלת <code>cost</code> גדול יותר ממניה גדולה באותו Q.</li>
+<li>Q גדול מ-10% מנפח הנר → מילוי חלקי, היתרה לנר הבא; Day מבטל יתרה בסגירה; GTC ממשיך.</li>
+<li>Stop sell עם גאפ (<code>open &lt; stop</code>) → מתמלא ב-<code>open × (1 − cost)</code>, לא ב-<code>stop</code>.</li>
+<li>Stop sell בלי גאפ (<code>open &gt; stop ≥ low</code>) → <code>stop × (1 − cost)</code>.</li>
+<li>Limit buy שנגע בדיוק (<code>low == limit</code>) → <strong>לא</strong> מתמלא; <code>low &lt; limit</code> → מתמלא ב-<code>min(open, limit)</code>.</li>
+<li>Bracket: סטופ וטייק באותו נר → הסטופ מתבצע, הטייק מבוטל.</li>
+<li>פקודה ב-<code>placed_at</code> = 20:00 (בורסה סגורה) → ממתינה; מתבצעת מול הנר הראשון למחרת.</li>
+<li>בורסה עם <code>exchangeDataDelayedBy = 20</code> דק&#39;: אין מילוי מנר שחותמתו ≤ <code>placed_at</code>.</li>
+<li>אין מילוי בנר עם נפח 0.</li>
+<li>עמלת ארה&quot;ב: 100 מניות → $1 (מינימום); 1,000 מניות ב-$0.50 → תקרת 0.5%.</li>
+<li>המרה: קנייה ב-$ מתוך ₪ מחויבת 0.5% ומשער הרגע; המכירה חזרה מחויבת שוב.</li>
+<li>(שלב 3) הון מתחת לסף תחזוקה → סגירה כפויה דרך המנוע, הפוזיציה המפסידה ביותר קודם.</li>
+<li>(שלב 3) <code>short_class = NONE</code> → פקודת שורט נדחית עם הודעה.</li>
+</ol>
+<hr>
+<h2 id="5-מסכים-שלב-2-אלא-אם-צוין">5. מסכים (שלב 2, אלא אם צוין)</h2>
+<p>סרגל תחתון עם 5 פריטים: <strong>תיק · מניות · מעקב · היסטוריה · יומן</strong>. בלי תפריטים נוספים. שפה פשוטה.</p>
+<ol>
+<li><strong>חיפוש מניה</strong> — שדה אחד, לפי שם או סימול; תוצאות עם סימול, שם, בורסה. (Yahoo search)</li>
+<li><strong>דף מניה</strong> — מחיר גדול + תגית <strong>בורסה · איחור</strong> (למשל &quot;NASDAQ · זמן אמת&quot;, &quot;ת&quot;א · 20 דק&#39;&quot;) + מטבע. גרף: יום / שבוע / חודש / שנה / 5 שנים; נרות או קו; נפח; ממוצעים נעים 20/50/200 (מתג אחד). שורת מידע: נפח יומי, נפח ממוצע 20 יום, ספרד משוער (%), תנודתיות 20 יום, שווי שוק. כפתורים: קנייה, מכירה (שלב 3: שורט), הוסף למעקב.</li>
+<li><strong>טיקט פקודה</strong> — צד, כמות (או סכום ב-₪ שמתורגם לכמות), סוג (שוק / לימיט / סטופ / טייק / סטופ+טייק), תוקף. <strong>תצוגה מקדימה לפני השליחה</strong>: מחיר שראיתי, ספרד משוער, החלקה משוערת, עמלה, המרה, <strong>מחיר ביצוע משוער</strong>, ולמי שבאיחור: &quot;הביצוע יתבצע לפי מחיר שיתפרסם בעוד ~20 דק&#39;&quot;. בשלב 3: עמלת השאלה ושימוש במרג&#39;ין.</li>
+<li><strong>רשימת מעקב</strong> — סימול, שם, מחיר, שינוי יומי %, תגית איחור. גרירה למחיקה.</li>
+<li><strong>העולות והיורדות של היום</strong> (ארה&quot;ב, Yahoo screener) — טאב בתוך &quot;מניות&quot;. לבורסות אחרות: מחושב מתוך רשימת המעקב בלבד (לכתוב זאת במסך).</li>
+<li><strong>תיק</strong> — הון כולל ב-₪, מזומן, שינוי יומי, רווח/הפסד ממומש ולא ממומש; רשימת פוזיציות: סימול, כמות, עלות ממוצעת, מחיר, רווח/הפסד ב-₪ ו-%; פקודות פתוחות (עם סטטוס: ממתינה / חלקית / בתור לפתיחה). שלב 3: כוח קנייה, מרחק מסף התחזוקה, באנר אזהרה.</li>
+<li><strong>היסטוריית עסקאות</strong> — כל מילוי: זמן, סימול, צד, כמות, <strong>המחיר שראיתי · מחיר הביצוע · ההפרש ב-₪</strong>, עמלות, סטטוס (מלא/חלקי/בוטל/נדחה + סיבה). סיכום למעלה: סך עלות ביצוע מאז ההתחלה.</li>
+<li><strong>השוואה למדד</strong> — בתוך &quot;תיק&quot;: עקומת ההון שלי מול S&amp;P 500 (<code>^GSPC</code>) ומול ת&quot;א-125 (<code>^TA125.TA</code>), שניהם מתורגמים ל-₪ (כאילו הושקעו ₪10,000 ביום הפתיחה). תקופות: חודש / 3 חודשים / שנה / מההתחלה.</li>
+<li><strong>יומן</strong> — בשליחת פקודה: שדה חופשי &quot;למה?&quot; (לא חובה). מסך היומן: רשימת העסקאות עם ה&quot;למה&quot;, ואחרי הסגירה שדה &quot;מה קרה בפועל&quot; + תוצאה. בלי תגיות וציונים בגרסה הראשונה.</li>
+<li><strong>הגדרות</strong> — מינימלי, מאחורי כפתור קטן: איפוס חשבון (עם אישור כפול), ייצוא כל הנתונים (JSON), גרסה. בלי מתגי ריאליזם: כל הפרמטרים ב-<code>config.json</code> בשרת.</li>
+</ol>
+<hr>
+<h2 id="6-מודל-נתונים-sqlite">6. מודל נתונים (SQLite)</h2>
+<p><code>account(id, base_ccy=&#39;ILS&#39;, cash_ils, created_at)</code> ·
+<code>positions(symbol, qty, avg_cost_ccy, ccy, opened_at, side)</code> ·
+<code>orders(id, symbol, side, type, qty, qty_filled, limit_price, stop_price, tif, status, placed_at, seen_price, seen_price_time, oco_group, note_why, note_after, reject_reason)</code> ·
+<code>fills(…סעיף 4.8)</code> ·
+<code>ledger(id, time, kind[fee|fx_fee|interest|borrow_fee|dividend|liquidation|deposit], amount_ils, ref_id, text)</code> ·
+<code>symbol_meta</code>, <code>symbol_stats</code>, <code>bars_1m</code>, <code>bars_1d</code>, <code>quotes</code>, <code>fx</code>, <code>movers</code>, <code>equity_daily(date, equity_ils, benchmark_spx_ils, benchmark_ta125_ils)</code>.</p>
+<hr>
+<h2 id="7-אבני-דרך">7. אבני דרך</h2>
+<h3 id="שלב-1-מחקר-מקורות-נתונים-הושלם-7-10-2026">שלב 1 — מחקר מקורות נתונים ✅ הושלם 7.10.2026</h3>
+<h3 id="שלב-2-גרסה-ראשונה-מניות-גרפים-תיק-עמלות-ביצוע-מציאותי">שלב 2 — גרסה ראשונה: מניות, גרפים, תיק, עמלות, ביצוע מציאותי</h3>
+<ul>
+<li><strong>2.1 שלד + שכבת נתונים</strong> — repo, server+web skeleton, proxy ל-Yahoo (chart/search/quote/fx/movers עם crumb), cache, header UA, query1/query2 fallback, backoff. בדיקה: <code>curl localhost:3011/api/quote/AAPL</code> ו-<code>/api/quote/TEVA.TA</code> מחזירים מחיר, איחור, מטבע, שעות מסחר.</li>
+<li><strong>2.2 סטטיסטיקות + מנוע ביצוע + בדיקות</strong> — EDGE ב-TS, adv20/sigma20/illiq20, המנוע לפי סעיף 4 (Market/Limit/Stop/TP/Bracket, תור מחוץ לשעות, כלל האיחור, חלקי), עמלות והמרה, scheduler. כל 12 הבדיקות של שלב 2 עוברות.</li>
+<li><strong>2.3 מסכים ראשונים</strong> — חיפוש, דף מניה עם גרף, טיקט עם תצוגה מקדימה, תיק בסיסי. systemd + Quick Tunnel. <strong>→ לשלוח קישור לתומר ולעצור לאישור.</strong></li>
+<li><strong>2.4 שאר המסכים</strong> — רשימת מעקב, עולות/יורדות, היסטוריה עם &quot;ראיתי מול ביצוע&quot;, יומן, הגדרות מינימליות.</li>
+<li><strong>2.5 מדד, עבודות יומיות, גיבוי</strong> — equity_daily, השוואה ל-S&amp;P/ת&quot;א-125 ב-₪, ג&#39;וב יומי (סטטיסטיקות, גיבוי DB), Playwright smoke.</li>
+<li><strong>2.6 עמידות</strong> — Alpaca כגיבוי (אם יש מפתח), named tunnel (אם יש טוקן), אינדיקטור בריאות מקור נתונים.</li>
+</ul>
+<h3 id="שלב-3-שורט-ומינוף">שלב 3 — שורט ומינוף</h3>
+<p>סעיפים 4.5–4.6, בדיקות 13–14, טיקט שורט עם עמלת השאלה, באנר מרג&#39;ין, אירועי סגירה כפויה בהיסטוריה, מתג PDT ב-config.</p>
+<h3 id="שלב-4-אופציות-קירוב-מבוסס-שרשרת-אמיתית">שלב 4 — אופציות (קירוב מבוסס שרשרת אמיתית)</h3>
+<ul>
+<li>ארה&quot;ב: שרשרת Cboe (15 דק&#39; איחור). קנייה ב-ask, מכירה ב-bid, עם כלל האיחור (4.1) ו-participation לפי נפח החוזה. בהתחלה רק לונג (קנייה של call/put); מכירת אופציות (עם מרג&#39;ין והקצאה) בגרסה הבאה.</li>
+<li>פקיעה: סגירה אוטומטית לפי הערך הפנימי ביום הפקיעה; מימוש אמריקאי ידני בלבד.</li>
+<li>מודל Black–Scholes (עם IV מהשרשרת) רק לתצוגת &quot;ערך תאורטי&quot; ולגיבוי כשאין שרשרת. לא לביצוע.</li>
+<li>בורסות אחרות: אין אופציות בגרסה זו.</li>
+</ul>
+<h3 id="שלב-5-רעיון-לא-מחויב-quot-שידור-חוזר-quot">שלב 5 (רעיון, לא מחויב) — &quot;שידור חוזר&quot;</h3>
+<p>הרצת יום מסחר מהעבר במהירות, עם המנוע האמיתי, כדי לבדוק אם ההחלטות וההרגשה עומדות במבחן בלי לחכות לשוק.</p>
+<hr>
+<h2 id="8-מה-תומר-צריך-לעשות">8. מה תומר צריך לעשות</h2>
+<ul>
+<li><strong>עכשיו:</strong> כלום. אבן דרך 2.3 תגיע עם קישור Quick Tunnel (נופל באתחול של ה-VM; זמני).</li>
+<li><strong>לכתובת קבועה (<code>sim.torah-worldwide.com</code>):</strong> ליצור ב-Cloudflare טוקן API עם ההרשאות: <em>Account → Cloudflare Tunnel: Edit</em> ו-<em>Zone (torah-worldwide.com) → DNS: Edit</em>, ולשלוח אותו בטלגרם. הבונה ישמור אותו ב-<code>~/.hermes/.cf_tunnel_token</code> (chmod 600).</li>
+<li><strong>אופציונלי, לגיבוי נתוני ארה&quot;ב:</strong> הרשמה ל-Alpaca כחשבון Paper-only (אימייל בלבד, בלי זיהוי) → להעתיק API Key + Secret לטלגרם.</li>
+</ul>
+<hr>
+<h2 id="9-config-json-ברירות-מחדל">9. config.json — ברירות מחדל</h2>
+<div class="tbl"><table><thead><tr><th>מפתח</th><th>ערך</th><th>הערה</th></tr></thead><tbody><tr><td><code>starting_cash_ils</code></td><td>10000</td><td></td></tr>
+<tr><td><code>impact_Y</code></td><td>0.7</td><td>חוק השורש, טווח 0.5–1.0</td></tr>
+<tr><td><code>participation</code></td><td>0.10</td><td>חלק מנפח נר הדקה</td></tr>
+<tr><td><code>spread_floor_ticks</code></td><td>2</td><td></td></tr>
+<tr><td><code>fees.us</code></td><td>per_share 0.005, min 1, max_pct 0.005</td><td></td></tr>
+<tr><td><code>fees.tase_pct</code> / <code>fees.tase_min_ils</code></td><td>0.001 / 10</td><td></td></tr>
+<tr><td><code>fees.other_pct</code> / <code>fees.other_min_usd</code></td><td>0.0015 / 5</td><td></td></tr>
+<tr><td><code>fx_fee_pct</code></td><td>0.005</td><td></td></tr>
+<tr><td><code>margin.initial</code> / <code>margin.maint_long</code> / <code>margin.maint_short</code></td><td>0.5 / 0.30 / 0.35</td><td>שלב 3</td></tr>
+<tr><td><code>margin.interest_apr</code></td><td>0.08</td><td>שלב 3</td></tr>
+<tr><td><code>short.etb_apr</code> / <code>short.htb_apr_base</code> / <code>short.htb_apr_max</code></td><td>0.003 / 0.15 / 0.40</td><td>שלב 3</td></tr>
+<tr><td><code>short.none_below_usd_adv</code> / <code>short.htb_below_usd_adv</code> / <code>short.htb_below_mcap</code></td><td>500000 / 20000000 / 2e9</td><td>שלב 3</td></tr>
+<tr><td><code>pdt_rule</code></td><td>false</td><td>שלב 3</td></tr>
+<tr><td><code>gtc_max_days</code></td><td>90</td><td></td></tr>
+<tr><td><code>quote_ttl_open_sec</code> / <code>quote_ttl_closed_sec</code></td><td>10 / 300</td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="10-הגדרת-quot-סיום-quot-לגרסה-1-שלב-2">10. הגדרת &quot;סיום&quot; לגרסה 1 (שלב 2)</h2>
+<ul>
+<li><input disabled="" type="checkbox"> מחפשים TEVA, פותחים <code>TEVA.TA</code>, רואים &quot;ת&quot;א · 20 דק&#39;&quot;, גרף 5 שנים נרות + נפח.</li>
+<li><input disabled="" type="checkbox"> שולחים קניית שוק ב-₪2,000; התצוגה המקדימה מראה ספרד, החלקה, עמלה, המרה; הפקודה ממתינה ומתבצעת רק אחרי שהפיד עובר את זמן השליחה.</li>
+<li><input disabled="" type="checkbox"> קונים מניית פני אמריקאית בכמות גדולה ביחס לנפח → מילוי חלקי + מחיר גרוע משמעותית מהמסך; ההפרש מופיע בהיסטוריה.</li>
+<li><input disabled="" type="checkbox"> מגדירים סטופ; בבדיקת יחידה סינתטית עם גאפ הוא מתמלא ב-open.</li>
+<li><input disabled="" type="checkbox"> פקודה בלילה → &quot;בתור לפתיחה&quot; → מתבצעת בפתיחה עם הגאפ.</li>
+<li><input disabled="" type="checkbox"> התיק מראה הון ב-₪, השוואה ל-S&amp;P 500 ולת&quot;א-125 ב-₪.</li>
+<li><input disabled="" type="checkbox"> יומן: &quot;למה קניתי&quot; נשמר ומופיע ליד העסקה.</li>
+<li><input disabled="" type="checkbox"> 12 בדיקות המנוע ו-Playwright smoke עוברים; השירות עולה לבד אחרי <code>systemctl --user restart stock-sim</code>.</li>
+<li><input disabled="" type="checkbox"> גיבוי יומי קיים ב-<code>data/backups/</code>.</li>
+</ul>
+
+</main>
+<a class="top" href="#">למעלה ↑</a>
+<script>
+// colour the three verification labels
+const map={'נבדק ועובד':'tag-ok','נקרא בלבד':'tag-warn','נכשל':'tag-bad','נפסל כחינם':'tag-bad','אומת היום':'tag-ok','לא אומת':'tag-warn'};
+const walker=document.createTreeWalker(document.querySelector('main'),NodeFilter.SHOW_TEXT);
+const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+for(const n of nodes){if(n.parentNode.closest('pre,code,a'))continue;let t=n.nodeValue;let hit=false;for(const k in map){if(t.includes(k)){hit=true;t=t.split(k).join('\u0000'+k+'\u0001');}}
+if(!hit)continue;const frag=document.createDocumentFragment();t.split(/(\u0000[^\u0001]+\u0001)/).forEach(p=>{if(p.startsWith('\u0000')){const k=p.slice(1,-1);const s=document.createElement('span');s.className=map[k];s.textContent=k;frag.appendChild(s);}else if(p)frag.appendChild(document.createTextNode(p));});n.parentNode.replaceChild(frag,n);}
+// insert TOC after the first h1
+const h1=document.querySelector('main h1');if(h1){const nav=document.createElement('nav');nav.className='toc';nav.innerHTML='<details open><summary>תוכן</summary><ul><li class="d2"><a href="#0-הוראות-לבונה-claude-code">0. הוראות לבונה (Claude Code)</a></li><li class="d2"><a href="#1-מטרה-ועקרונות">1. מטרה ועקרונות</a></li><li class="d2"><a href="#2-ארכיטקטורה-החלטות-סגורות">2. ארכיטקטורה (החלטות סגורות)</a></li><li class="d2"><a href="#3-שכבת-נתונים">3. שכבת נתונים</a></li><li class="d3"><a href="#3-1-מקורות-אומתו-7-10-2026">3.1 מקורות (אומתו 7.10.2026)</a></li><li class="d3"><a href="#3-2-cache-ב-sqlite">3.2 Cache ב-SQLite</a></li><li class="d3"><a href="#3-3-סטטיסטיקות-לכל-סמל-מנרות-יומיים-מחושבות-פעם-ביום">3.3 סטטיסטיקות לכל סמל (מנרות יומיים, מחושבות פעם ביום)</a></li><li class="d2"><a href="#4-מנוע-הביצוע-הלב-של-הפרויקט-חוקים-מחייבים">4. מנוע הביצוע (הלב של הפרויקט) — חוקים מחייבים</a></li><li class="d3"><a href="#4-1-כללי">4.1 כללי</a></li><li class="d3"><a href="#4-2-עלות-ביצוע-לכל-מילוי-חד-כיווני">4.2 עלות ביצוע לכל מילוי (חד-כיווני)</a></li><li class="d3"><a href="#4-3-נזילות-ומילוי-חלקי">4.3 נזילות ומילוי חלקי</a></li><li class="d3"><a href="#4-4-סוגי-פקודות">4.4 סוגי פקודות</a></li><li class="d3"><a href="#4-5-שורט-שלב-3">4.5 שורט (שלב 3)</a></li><li class="d3"><a href="#4-6-מינוף-ומרג-39-ין-שלב-3">4.6 מינוף ומרג&#39;ין (שלב 3)</a></li><li class="d3"><a href="#4-7-עמלות-דלוקות-תמיד-שינוי-רק-ב-config-בלי-מתג-בממשק">4.7 עמלות (דלוקות תמיד; שינוי רק ב-config, בלי מתג בממשק)</a></li><li class="d3"><a href="#4-8-רשומת-ביצוע-fills">4.8 רשומת ביצוע (fills)</a></li><li class="d3"><a href="#4-9-בדיקות-חובה-למנוע-vitest-מנותקות-מרשת-נרות-סינתטיים">4.9 בדיקות חובה למנוע (vitest, מנותקות מרשת, נרות סינתטיים)</a></li><li class="d2"><a href="#5-מסכים-שלב-2-אלא-אם-צוין">5. מסכים (שלב 2, אלא אם צוין)</a></li><li class="d2"><a href="#6-מודל-נתונים-sqlite">6. מודל נתונים (SQLite)</a></li><li class="d2"><a href="#7-אבני-דרך">7. אבני דרך</a></li><li class="d3"><a href="#שלב-1-מחקר-מקורות-נתונים-הושלם-7-10-2026">שלב 1 — מחקר מקורות נתונים ✅ הושלם 7.10.2026</a></li><li class="d3"><a href="#שלב-2-גרסה-ראשונה-מניות-גרפים-תיק-עמלות-ביצוע-מציאותי">שלב 2 — גרסה ראשונה: מניות, גרפים, תיק, עמלות, ביצוע מציאותי</a></li><li class="d3"><a href="#שלב-3-שורט-ומינוף">שלב 3 — שורט ומינוף</a></li><li class="d3"><a href="#שלב-4-אופציות-קירוב-מבוסס-שרשרת-אמיתית">שלב 4 — אופציות (קירוב מבוסס שרשרת אמיתית)</a></li><li class="d3"><a href="#שלב-5-רעיון-לא-מחויב-quot-שידור-חוזר-quot">שלב 5 (רעיון, לא מחויב) — &quot;שידור חוזר&quot;</a></li><li class="d2"><a href="#8-מה-תומר-צריך-לעשות">8. מה תומר צריך לעשות</a></li><li class="d2"><a href="#9-config-json-ברירות-מחדל">9. config.json — ברירות מחדל</a></li><li class="d2"><a href="#10-הגדרת-quot-סיום-quot-לגרסה-1-שלב-2">10. הגדרת &quot;סיום&quot; לגרסה 1 (שלב 2)</a></li></ul></details>';h1.insertAdjacentElement('afterend',nav);}
+</script>
+</body>
+</html>
